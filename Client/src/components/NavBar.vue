@@ -45,11 +45,11 @@
               <v-card>
                 <v-card-title>Join Class</v-card-title>
                 <v-card-text>
-                  <v-text-field label="Enter the class code:"></v-text-field>
+                  <v-text-field label="Enter the class code:" v-model="classCodeToJoin"></v-text-field>
                 </v-card-text>
                 <v-row justify="space-around">
                   <v-btn color="warning" outlined @click.stop="joinClass = false">Cancel</v-btn>
-                  <v-btn color="success" outlined>Join</v-btn>
+                  <v-btn color="success" outlined @click="tojoinClass()">Join</v-btn>
                 </v-row>
                 <v-row>
                   <div class="mt-5"></div>
@@ -65,7 +65,7 @@
                 <v-card-title>Create Class</v-card-title>
                 <v-card-text>
                   <v-row>
-                      <v-text-field label="Class Room Name" v-model="roomNameToCreate"></v-text-field>
+                      <v-text-field label="Class Room Name" v-model="classNameToCreate"></v-text-field>
                   </v-row>
                 </v-card-text>
                 <v-row justify="space-around">
@@ -173,7 +173,7 @@
 
         <v-list-item
           v-for="_class in classOwnerShip"
-          :key="_class.classroomName"
+          :key="_class.classroomOwned"
           route
           :to="_class.code"
           replace
@@ -183,11 +183,11 @@
           </v-list-item-content>
         </v-list-item>
 
-                <v-subheader>Class Joined</v-subheader>
+        <v-subheader>Class Joined</v-subheader>
 
         <v-list-item
           v-for="_class in classParticipated"
-          :key="_class.classroomName"
+          :key="_class.classroomJoined"
           route
           :to="_class.code"
           replace
@@ -211,7 +211,8 @@ export default {
       drawer: true,
       joinClass: false,
       createClass: false,
-      roomNameToCreate : "",
+      classCodeToJoin : "",
+      classNameToCreate : "",
       classOwnerShip : [
 
       ],
@@ -230,9 +231,14 @@ export default {
       this.classOwnerShip = _class.data.classOwnerShip
     },
     async tocreateClass(){
-      const _class = await backend.createClass(this.roomNameToCreate)
+      const _class = await backend.createClass(this.classNameToCreate)
       this.classOwnerShip.push(_class.data)
       this.createClass =  false
+    },
+    async tojoinClass(){
+      const _class = await backend.joinClass(this.classCodeToJoin)
+      this.classParticipated.push(_class.data)
+      this.joinClass = false
     }
   },
   created() {

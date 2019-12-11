@@ -20,6 +20,7 @@ class PostService{
     // }
 
 
+
     // Get All Classes form DB
     static getClasses(){
         const email = "coolguys@gmail.com"
@@ -40,9 +41,18 @@ class PostService{
 
     }
 
+    // To join class
+    static joinClass(code){
+        const email = "coolguys@gmail.com"
+        return axios.post(`${url}joinclass`, {
+            email,
+            code
+        })
+    }
+
     // Post Data for signing up
-    static signUp(email,pwd,name){
-        email = "coolguys@gmail.com"
+    static signUp(pwd,name){
+        const email = "coolguys@gmail.com"
         return axios.post(`${url}signUp`, {
             email,
             pwd,

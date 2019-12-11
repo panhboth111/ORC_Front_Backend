@@ -40,7 +40,7 @@ router.post("/class", async (req , res) => {
             }
         }
 
-        res.json({classOwnerShip ,classParticipated})
+        res.json({classOwnerShip , classParticipated})
         
     }catch(err){
         res.json({
@@ -94,7 +94,7 @@ router.post("/joinclass", async (req, res) => {
             }else{
                 _class.members.push(req.body.email)
                 // Send back the class
-                res.json({_class})
+                res.json(_class)
             }
         }else{
             res.json({
