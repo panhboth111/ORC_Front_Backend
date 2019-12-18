@@ -9,14 +9,17 @@ const app = express();
 
 // Import Routes
 const userRoute = require("./routes/users")
+const authRoute = require("./routes/auth")
 
 //MiddleWare
 app.use(bodyparser.json())
 app.use(cors())
 app.use("/users",userRoute)
+app.use("/auth",authRoute)
+
 
 // Routes
-app.get('/', (req, res) => {
+app.get(' ', (req, res) => {
     res.send("We are on home!");
 });
 

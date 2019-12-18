@@ -87,8 +87,8 @@
 </template>
 
 <script>
-import firebase from "firebase";
-
+import backend from "../PostService";
+import auth from '../auth';
 export default {
   name: "loginbox",
   data() {
@@ -104,65 +104,28 @@ export default {
     };
   },
   methods: {
-    login() {
-      this.isLoading = true;
-      firebase
-        .auth()
-        .signInWithEmailAndPassword(this.email, this.password)
-        .then(
-          () => {
-            this.isLoading = false;
-            this.$router.replace("home");
-            location.reload();
-          },
-          err => {
-            this.isLoading = false;
-            this.hasError = true;
-            console.log("Oops, Something Went Wrong...\n" + err.message);
-          }
-        );
+    async login() {
+      this.isLoading = true
+      const message = await backend.login(this.email, this.password)
+      if (message){
+        alert(message.message)
+      }
+      this.isLoading = false
     },
-    signUp() {
-      firebase
-        .auth()
-        .createUserWithEmailAndPassword(this.signUpEmail, this.signUpPassword)
-        .then(
-          () => {
-            this.$router.replace("home");
-          },
-          err => {
-            console.log("Oops, Something Went Wrong...\n" + err.message);
-          }
-        );
-    },
-    googleSignIn() {
-      var provider = new firebase.auth.GoogleAuthProvider();
-      this.isLoading = true;
-      firebase
-        .auth()
-        .signInWithPopup(provider)
-        .then(result => {
-          console.log(result);
-          this.isLoading = false;
-          this.$router.replace("home");
-          location.reload();
-        })
-        .catch(error => {
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          // The email of the user's account used.
-          var email = error.email;
-          // The firebase.auth.AuthCredential type that was used.
-          var credential = error.credential;
-          // ...
-          console.log(errorCode);
-          console.log(errorMessage);
-          console.log(email);
-          console.log(credential);
-          this.isLoading = false;
-        });
+    async signUp() {
+      this.isLoading = true
+      const user = await backend.signUp(this.signUpEmail,this.signUpPassword,this.name)
+      const {message} = user.data
+      if (message){
+        alert(message)
+      }else{
+        alert("Registered as successfully")
+      }
+      this.isLoading = false
     }
+  },
+  created(){
+    auth()
   }
 };
 </script>
