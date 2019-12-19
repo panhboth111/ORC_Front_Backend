@@ -50,13 +50,13 @@
             <v-btn color="info" class="my-2" @click="login()">Login</v-btn>
           </v-row>
 
-          <v-row justify="space-around">
+          <!-- <v-row justify="space-around">
             <p class="my-2">--or--</p>
           </v-row>
 
           <v-row justify="space-around">
             <v-btn color="info" class="my-2" @click="googleSignIn()">Sign In With Google</v-btn>
-          </v-row>
+          </v-row> -->
         </v-tab-item>
 
         <v-tab-item>

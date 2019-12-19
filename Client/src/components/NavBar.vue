@@ -226,6 +226,10 @@ export default {
     };
   },
   methods: {
+    signOut(){
+      localStorage.setItem("auth-token","")
+      auth()
+    },
     async togetUserInfo(){
       const user = await backend.getUserInfo()
       if (user.data){
