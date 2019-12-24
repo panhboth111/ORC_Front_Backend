@@ -27,23 +27,20 @@ class PostService{
 
     // Create a new class for the current user
     static createClass( classroomName){
-        const email = "coolguys@gmail.com"
+        const token = window.localStorage.getItem("auth-token")
         if (classroomName != null && classroomName != ""){
             return axios.post(`${url}users/createclass`,{
-                email,
                 classroomName
-            })
+            },{ params:{}, headers: { 'auth-token': token } })
         }
-
     }
 
     // To join class
     static joinClass(code){
-        const email = "coolguys@gmail.com"
+        const token = window.localStorage.getItem("auth-token")
         return axios.post(`${url}users/joinclass`, {
-            email,
             code
-        })
+        },{ params:{}, headers: { 'auth-token': token } })
     }
 
     // Post Data for signing up
@@ -55,6 +52,7 @@ class PostService{
         })
     }
 
+    // Post Data for login
     static async login(email,pwd){
         const credential = await axios.post(`${url}auth/login`,{
             email,

@@ -238,8 +238,7 @@ export default {
       }
     },
     async tocreateClass(){
-      const _class = await backend.createClass(this.classNameToCreate)
-      this.classOwnerShip.push(_class.data)
+      await backend.createClass(this.classNameToCreate)
       this.createClass =  false
     },
     async tojoinClass(){
