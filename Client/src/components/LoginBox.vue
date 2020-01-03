@@ -89,6 +89,8 @@
 <script>
 import backend from "../PostService";
 import auth from '../auth';
+import synclog from '../syncLog';
+
 export default {
   name: "loginbox",
   data() {
@@ -109,6 +111,8 @@ export default {
       const message = await backend.login(this.email, this.password)
       if (message){
         alert(message.message)
+      }else{
+        localStorage.setItem("LastLogged",Date.now())
       }
       this.isLoading = false
     },
@@ -126,6 +130,7 @@ export default {
   },
   created(){
     auth()
+    synclog
   }
 };
 </script>

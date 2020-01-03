@@ -1,6 +1,7 @@
 import axios from 'axios';
-
+import cookie from './cookies'
 const url = "http://localhost:3000/"
+
 
 class PostService{
     //Get Posts
@@ -21,13 +22,13 @@ class PostService{
 
     // Get UserInfo
     static getUserInfo(){
-        const token = window.localStorage.getItem("auth-token")
+        const token = cookie.getCookie("auth-token") //window.localStorage.getItem("auth-token")
         return axios.get(`${url}users/user`,{ params:{}, headers: { 'auth-token': token } })
     }
 
     // Create a new class for the current user
     static createClass( classroomName){
-        const token = window.localStorage.getItem("auth-token")
+        const token = cookie.getCookie("auth-token") //window.localStorage.getItem("auth-token")
         if (classroomName != null && classroomName != ""){
             return axios.post(`${url}users/createclass`,{
                 classroomName
@@ -37,7 +38,7 @@ class PostService{
 
     // To join class
     static joinClass(code){
-        const token = window.localStorage.getItem("auth-token")
+        const token = cookie.getCookie("auth-token") //window.localStorage.getItem("auth-token")
         return axios.post(`${url}users/joinclass`, {
             code
         },{ params:{}, headers: { 'auth-token': token } })
@@ -60,12 +61,17 @@ class PostService{
         })
         const {token} = credential.data
         if (token){
-            window.localStorage.setItem("auth-token",token)
+            cookie.setCookie("auth-token",token,30)//window.localStorage.setItem("auth-token",token)
             window.location.replace("/home")
             return null
         }else{
             return {"message" : credential.data.message}
         }
+    }
+
+    static async logout(){
+        cookie.setCookie("auth-token","",30)
+        localStorage.setItem("LastLogged", Date.now())
     }
 
 }

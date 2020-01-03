@@ -7,6 +7,7 @@ const User = require("../models/user")
 const Credential = require("../models/credential")
 const _Class = require("../models/class")
 
+
 //Get Data for sign up
 router.post("/signUp", async (req , res ) => {
     await bcrypt.genSalt(10, (err, salt) => {

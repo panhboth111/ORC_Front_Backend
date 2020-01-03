@@ -204,6 +204,7 @@
 <script>
 import backend from "../PostService";
 import auth from '../auth';
+import synclog from '../syncLog'
 
 export default {
   name: "NavBar",
@@ -227,7 +228,7 @@ export default {
   },
   methods: {
     signOut(){
-      localStorage.setItem("auth-token","")
+      backend.logout()
       auth()
     },
     async togetUserInfo(){
@@ -249,6 +250,7 @@ export default {
   },
   created() {
     auth()
+    synclog
     this.togetUserInfo()
   }
 };

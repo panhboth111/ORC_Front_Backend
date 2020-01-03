@@ -8,8 +8,6 @@ const router = express.Router();
 const uID = require("../JS/UniqueCode")
 const verify = require("./verifyToken")
 
-
-
 //Routes
 router.get("/", async (req , res) => {
     try{
