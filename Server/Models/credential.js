@@ -12,6 +12,10 @@ const schema = mongoose.Schema({
         required : true,
         min : 6
     },
+    role : {
+        type : String,
+        default : "Student"
+    },
     date : {
         type : Date,
         default : Date.now

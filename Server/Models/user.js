@@ -3,8 +3,14 @@ const mongoose = require('mongoose');
 const schema = mongoose.Schema({
     classOwnerShip : Array,
     classParticipated : Array,
-    email : String,
-    name : String,
+    email : {
+        type : String,
+        required : true
+    },
+    name : {
+        type : String,
+        require : true
+    },
 })
 
 

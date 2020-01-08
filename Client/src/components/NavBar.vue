@@ -203,6 +203,8 @@
 
 <script>
 import backend from "../PostService";
+import auth from '../auth';
+import synclog from '../syncLog'
 
 export default {
   name: "NavBar",
@@ -221,18 +223,23 @@ export default {
       ],
       userName: "",
       userEmail: "",
-      userPhotoId: ""
+      userPhotoId: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSI3KtK9My4UUJkijiX52oTwv3umHfLKgnWcjVYUnc2Uvq9VDSG"
     };
   },
   methods: {
-    async getClass () {
-      const _class = await backend.getClasses()
-      this.classParticipated = _class.data.classParticipated
-      this.classOwnerShip = _class.data.classOwnerShip
+    signOut(){
+      backend.logout()
+      auth()
+    },
+    async togetUserInfo(){
+      const user = await backend.getUserInfo()
+      if (user.data){
+        this.userName = user.data.name
+        this.userEmail = user.data.email
+      }
     },
     async tocreateClass(){
-      const _class = await backend.createClass(this.classNameToCreate)
-      this.classOwnerShip.push(_class.data)
+      await backend.createClass(this.classNameToCreate)
       this.createClass =  false
     },
     async tojoinClass(){
@@ -242,7 +249,9 @@ export default {
     }
   },
   created() {
-    this.getClass()
+    auth()
+    synclog
+    this.togetUserInfo()
   }
 };
 </script>
