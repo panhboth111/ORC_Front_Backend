@@ -37,7 +37,7 @@
                 <h4 class="text-info font-weight-bold">Sign Up <span class="badge badge-primary">Post</span> </h4>
                 <p> <span class="badge badge-info""> Description </span> :  Use to sign up one user. </p>
                 <p> <span class="badge badge-info""> Route </span> :  <p class="bg-dark rounded p-3 pl-4 text-muted">http://localhost:3000/auth/signUp</p> </p>
-                <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Email, Password, Name <pre class="bg-dark rounded text-warning">
+                <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Email, Password, Name <pre class="bg-dark rounded text-success">
                     
     axios.post(`http://localhost:3000/auth/signUp`, {
         email,
@@ -65,6 +65,32 @@
 
             <hr>
 
+            <p>
+                <h4 class="text-info font-weight-bold">Login <span class="badge badge-primary">Post</span> </h4>
+                <p> <span class="badge badge-info""> Description </span> :  Use to verify and logged in one user. </p>
+                <p> <span class="badge badge-info""> Route </span> :  <p class="bg-dark rounded p-3 pl-4 text-muted">http://localhost:3000/auth/login</p> </p>
+                <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Email, Password <pre class="bg-dark rounded text-success">
+                    
+    axios.post(`http://localhost:3000/auth/login`, {
+        email,
+        pwd
+    })
+                </pre></p>
+                <p> <span class="badge badge-success""> Return Data </span> : On each successful request, data will be returned as following <pre class="bg-dark rounded text-warning">
+
+    {
+        message : <span class="text-success">Login Success</span>,
+        token : <span class="text-info">token</span class="text-info">
+    }
+                </pre> </p>
+                <p> <span class="badge badge-danger""> Failed Data </span> : On each insuccessful request, data will be returned as following <pre class="bg-dark rounded text-warning">
+
+    {
+        message : err.message
+    }
+    <span class="text-muted">// Error Message include : "Password entered is incorrect" , "Email does not exist"</span>
+                </pre> </p>
+            </p>
             
         </div>
     </div>
