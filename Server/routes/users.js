@@ -21,7 +21,7 @@ router.get("/", async (req , res) => {
 })
 
 //Get all classes that student participated
-router.post("/class", verify , async (req , res) => {
+router.get("/class", verify , async (req , res) => {
     try{
         const user = await User.findOne({email : req.user.email});
         const classCodes = user.classParticipated;
@@ -43,7 +43,7 @@ router.post("/class", verify , async (req , res) => {
         
     }catch(err){
         res.json({
-            message : "Error Occured : " + err
+            message : err
         })       
     }
 })
