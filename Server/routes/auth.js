@@ -3,9 +3,9 @@ const app = express()
 const router = express.Router();
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const User = require("../models/user")
-const Credential = require("../models/credential")
-const _Class = require("../models/class")
+const User = require("../Models/user")
+const Credential = require("../Models/credential")
+const _Class = require("../Models/class")
 
 
 //Get Data for sign up
