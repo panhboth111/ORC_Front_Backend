@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <title>Document</title>
+</head>
+<body class="bg-dark text-light p-2 text-center">
+    <div class="col-md-8 offset-md-2 p-2">
+        <h1>Online Remote Classroom <span class="badge badge-primary">API Document</span></h1>
+    </div>
+    <div class="container-fluid text-center">
+        <div class="col-lg-10 offset-md-1 bg-secondary rounded-sm text-left p-5">
+            <p>
+                ORC Api are written using
+                <ul class="text-info">
+                    <li>Node Js</li>
+                    <li>Express</li>
+                    <li>MongoDB</li>
+                    <li>JWT</li>
+                </ul>
+            </p>
+            <p>
+                To access to the API on the front end level, <strong class="text-warning">AXIOS</strong> module is required!
+            </p>
+            <p>
+                Each access are defined and control by different gates called as <strong class="text-warning">Route</strong>
+                Each route are available for differe purposes. And should be used to retrieve a specific data as required.
+            </p>
+            
+            <hr>
+
+            <p>
+                <h4 class="text-info font-weight-bold">Sign Up <span class="badge badge-primary">Post</span> </h4>
+                <p> <span class="badge badge-info""> Description </span> :  Use to sign up one user. </p>
+                <p> <span class="badge badge-info""> Route </span> :  <p class="bg-dark rounded p-3 pl-4 text-muted">http://localhost:3000/auth/signUp</p> </p>
+                <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Email, Password, Name <pre class="bg-dark rounded text-success">
+                    
+    axios.post(`http://localhost:3000/auth/signUp`, {
+        email,
+        pwd,
+        name
+    })
+                </pre></p>
+                <p> <span class="badge badge-success""> Return Data </span> : On each successful request, data will be returned as following <pre class="bg-dark rounded text-warning">
+
+    {
+        classOwnerShip : [],
+        classParticipated : [],
+        email : <span class="text-info">email</span> ,
+        name : <span class="text-info">name</span class="text-info">
+    }
+                </pre> </p>
+                <p> <span class="badge badge-danger""> Failed Data </span> : On each insuccessful request, data will be returned as following <pre class="bg-dark rounded text-warning">
+
+    {
+        message : err.message
+    }
+    <span class="text-muted">// Error Message include : "Email is already registered!" , Validation Error Message</span>
+                </pre> </p>
+            </p>
+
+            <hr>
+
+            <p>
+                <h4 class="text-info font-weight-bold">Login <span class="badge badge-primary">Post</span> </h4>
+                <p> <span class="badge badge-info""> Description </span> :  Use to verify and logged in one user. </p>
+                <p> <span class="badge badge-info""> Route </span> :  <p class="bg-dark rounded p-3 pl-4 text-muted">http://localhost:3000/auth/login</p> </p>
+                <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Email, Password <pre class="bg-dark rounded text-success">
+                    
+    axios.post(`http://localhost:3000/auth/login`, {
+        email,
+        pwd
+    })
+                </pre></p>
+                <p> <span class="badge badge-success""> Return Data </span> : On each successful request, data will be returned as following <pre class="bg-dark rounded text-warning">
+
+    {
+        message : <span class="text-success">Login Success</span>,
+        token : <span class="text-info">token</span class="text-info">
+    }
+                </pre> </p>
+                <p> <span class="badge badge-danger""> Failed Data </span> : On each insuccessful request, data will be returned as following <pre class="bg-dark rounded text-warning">
+
+    {
+        message : err.message
+    }
+    <span class="text-muted">// Error Message include : "Password entered is incorrect" , "Email does not exist"</span>
+                </pre> </p>
+            </p>
+            
+        </div>
+    </div>
+</body>
+</html>
