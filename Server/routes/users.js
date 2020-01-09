@@ -63,6 +63,8 @@ router.post("/createclass", verify , async (req, res) => {
         const _class = new _Class({
             classroomName: req.body.classroomName,
             code: code,
+            isPrivate : req.body.isPrivate,
+            password : req.body.password,
             currentlyStreaming: "",
             members: [],
             owner: req.user.email
@@ -111,7 +113,7 @@ router.post("/joinclass", verify , async (req, res) => {
         }
    }catch(err){
         res.json({
-            message : "Error Occured : " + err
+            message : err
         })
    }
 })
@@ -134,7 +136,7 @@ router.post("/deleteClass", verify , async (req,res)=>{
         }
 
     }catch(err){
-        res.send({"message" : "Error Occured"})   
+        res.send({"message" : err})   
     }
 })
 
@@ -185,7 +187,7 @@ router.post("/stopStream", verify, async (req, res) => {
         await _Class.updateOne({code,owner},{currentlyStreaming : ""})
         res.json({"message" : "stopped the stream as successfully"})
     }catch(err){
-        res.json({"message" : "an error occured"})
+        res.json({"message" : err})
     }
 })
 
