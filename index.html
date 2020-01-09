@@ -10,12 +10,12 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>  
     <title>Document</title>
 </head>
-<body class="bg-secondary text-light p-2 text-center">
+<body class="bg-dark text-light p-2 text-center">
     <div class="col-md-8 offset-md-2 p-2">
         <h1>Online Remote Classroom <span class="badge badge-primary">API Document</span></h1>
     </div>
     <div class="container-fluid text-center">
-        <div class="col-lg-10 offset-md-1 rounded-sm text-left p-5">
+        <div class="col-lg-10 offset-sm-1 rounded-sm text-left p-1">
             <p>
                 ORC Api are written using
                 <ul class="text-info">
@@ -30,7 +30,7 @@
             </p>
             <p>
                 Each access are defined and control by different gates called as <strong class="text-warning">Route</strong>
-                Each route are available for differe purposes. And should be used to retrieve a specific data as required.
+                Each route are available for different purposes. And should be used to retrieve a specific data as required.
             </p>
             
             <hr>
@@ -38,10 +38,10 @@
             <div class="accordion" id="accordionExample">
                 
                 <!-- Sign Up -->
-                <div class="card bg-dark">
+                <div class="card bg-secondary">
                   <div class="card-header" id="headingOne">
                     <h2 class="mb-0">
-                      <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                      <button class="btn btn-link text-decoration-none" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                         <h4 class="text-light font-weight-bold">Sign Up <span class="badge badge-primary">Post</span> </h4>
                       </button>
                     </h2>
@@ -51,8 +51,8 @@
                     <div class="card-body">
                         <p>
                             <p> <span class="badge badge-info""> Description </span> :  Use to sign up one user. </p>
-                            <p> <span class="badge badge-info""> Route </span> :  <p class="bg-secondary rounded p-3 pl-4 text-info">http://localhost:3000/auth/signUp</p> </p>
-                            <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Email, Password, Name <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-info""> Route </span> :  <p class="bg-dark rounded p-3 pl-4 text-info">http://localhost:3000/auth/signUp</p> </p>
+                            <p> <span class="badge badge-success""> AXIOS Parameters </span> :  Email, Password, Name <pre class="bg-dark rounded text-warning">
                                 
     axios.post(`http://localhost:3000/auth/signUp`, {
             email,
@@ -60,7 +60,7 @@
             name
         })
                             </pre></p>
-                            <p> <span class="badge badge-success""> Return Data </span> : On each successful request, data will be returned as following <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-success""> Return Data </span> : On each successful request, data will be returned as following <pre class="bg-dark rounded text-warning">
             
     {
         classOwnerShip : [],
@@ -69,7 +69,7 @@
         name : <span class="text-info">name</span class="text-info">
     }
                             </pre> </p>
-                            <p> <span class="badge badge-danger""> Failed Data </span> : On each insuccessful request, data will be returned as following <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-danger""> Failed Data </span> : On each insuccessful request, data will be returned as following <pre class="bg-dark rounded text-warning">
             
     {
         message : err.message
@@ -82,10 +82,10 @@
                 </div>
 
                 <!-- Login -->
-                <div class="card bg-dark">
+                <div class="card bg-secondary">
                     <div class="card-header" id="headingOne">
                       <h2 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">
+                        <button class="btn btn-link text-decoration-none" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">
                           <h4 class="text-light font-weight-bold">Login <span class="badge badge-primary">Post</span> </h4>
                         </button>
                       </h2>
@@ -95,15 +95,15 @@
                       <div class="card-body">
                         <p>
                             <p> <span class="badge badge-info""> Description </span> :  Use to verify and logged in one user. </p>
-                            <p> <span class="badge badge-info""> Route </span> :  <p class="bg-secondary rounded p-3 pl-4 text-info">http://localhost:3000/auth/login</p> </p>
-                            <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Email, Password <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-info""> Route </span> :  <p class="bg-dark rounded p-3 pl-4 text-info">http://localhost:3000/auth/login</p> </p>
+                            <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Email, Password <pre class="bg-dark rounded text-warning">
                                 
     axios.post(`http://localhost:3000/auth/login`, {
         email,
         pwd
     })
                             </pre></p>
-                            <p> <span class="badge badge-success""> Return Data </span> : On each successful request, data will be returned as following <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-success""> Return Data </span> : On each successful request, data will be returned as following <pre class="bg-dark rounded text-warning">
             
     {
         message : <span class="text-info">Login Success</span>,
@@ -111,7 +111,7 @@
     }
     <span class="text-light">// Token is very important in session and credentials management, should be handled and assigned properly to use authorized requests.</span>
                             </pre> </p>
-                            <p> <span class="badge badge-danger""> Failed Data </span> : On each insuccessful request, data will be returned as following <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-danger""> Failed Data </span> : On each insuccessful request, data will be returned as following <pre class="bg-dark rounded text-warning">
             
     {
         message : err.message
@@ -124,10 +124,10 @@
                 </div>
 
                 <!-- Get User Info -->
-                <div class="card bg-dark">
+                <div class="card bg-secondary">
                     <div class="card-header" id="headingOne">
                       <h2 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseOne">
+                        <button class="btn btn-link text-decoration-none" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseOne">
                           <h4 class="text-light font-weight-bold">Get User <span class="badge badge-success">Get</span> <span class="badge badge-danger">Authorized</span></h4>
                         </button>
                       </h2>
@@ -137,12 +137,12 @@
                       <div class="card-body">
                         <p>
                             <p> <span class="badge badge-info""> Description </span> :  Use to get information about the current logged in user. </p>
-                            <p> <span class="badge badge-info""> Route </span> :  <p class="bg-secondary rounded p-3 pl-4 text-info">http://localhost:3000/users/user</p> </p>
-                            <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Token ( in headers ) <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-info""> Route </span> :  <p class="bg-dark rounded p-3 pl-4 text-info">http://localhost:3000/users/user</p> </p>
+                            <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Token ( in headers ) <pre class="bg-dark rounded text-warning">
                                 
     axios.get(`http://localhost:3000/users/user`,{ params:{}, headers: { 'auth-token': token } })
                             </pre></p>
-                            <p> <span class="badge badge-success""> Return Data </span> : On each successful request, data will be returned as following <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-success""> Return Data </span> : On each successful request, data will be returned as following <pre class="bg-dark rounded text-warning">
     
     {      
         classOwnerShip : [],
@@ -151,7 +151,7 @@
         name : <span class="text-info">name</span class="text-info">
     }
                             </pre> </p>
-                            <p> <span class="badge badge-danger""> Failed Data </span> : On each insuccessful request, data will be returned as following <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-danger""> Failed Data </span> : On each insuccessful request, data will be returned as following <pre class="bg-dark rounded text-warning">
             
     {
         message : err.message
@@ -163,10 +163,10 @@
                 </div>
 
                 <!-- Get Class -->
-                <div class="card bg-dark">
+                <div class="card bg-secondary">
                     <div class="card-header" id="headingOne">
                       <h2 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseOne">
+                        <button class="btn btn-link text-decoration-none" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseOne">
                           <h4 class="text-light font-weight-bold">Get Class <span class="badge badge-success">Get</span> <span class="badge badge-danger">Authorized</span></h4>
                         </button>
                       </h2>
@@ -176,19 +176,19 @@
                       <div class="card-body">
                         <p>
                             <p> <span class="badge badge-info""> Description </span> :  Get all the class that the current user has participated. </p>
-                            <p> <span class="badge badge-info""> Route </span> :  <p class="bg-secondary rounded p-3 pl-4 text-info">http://localhost:3000/users/class</p> </p>
-                            <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Token ( in headers ) <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-info""> Route </span> :  <p class="bg-dark rounded p-3 pl-4 text-info">http://localhost:3000/users/class</p> </p>
+                            <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Token ( in headers ) <pre class="bg-dark rounded text-warning">
                                 
     axios.get(`http://localhost:3000/users/class`,{ params:{}, headers: { 'auth-token': token } })
                             </pre></p>
-                            <p> <span class="badge badge-success""> Return Data </span> : On each successful request, data will be returned as following <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-success""> Return Data </span> : On each successful request, data will be returned as following <pre class="bg-dark rounded text-warning">
     
     {      
         classOwnerShip : [],
         classParticipated : []
     }
                             </pre> </p>
-                            <p> <span class="badge badge-danger""> Failed Data </span> : On each insuccessful request, data will be returned as following <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-danger""> Failed Data </span> : On each insuccessful request, data will be returned as following <pre class="bg-dark rounded text-warning">
             
     {
         message : err.message
@@ -200,10 +200,10 @@
                 </div>
 
                 <!-- Create Class -->
-                <div class="card bg-dark">
+                <div class="card bg-secondary">
                     <div class="card-header" id="headingOne">
                       <h2 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseOne">
+                        <button class="btn btn-link text-decoration-none" type="button" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseOne">
                           <h4 class="text-light font-weight-bold">Create Class <span class="badge badge-primary">Post</span> <span class="badge badge-danger">Authorized</span></h4>
                         </button>
                       </h2>
@@ -213,14 +213,14 @@
                       <div class="card-body">
                         <p>
                             <p> <span class="badge badge-info""> Description </span> :  Create a new class which will be owned by the current user. </p>
-                            <p> <span class="badge badge-info""> Route </span> :  <p class="bg-secondary rounded p-3 pl-4 text-info">http://localhost:3000/users/createclass</p> </p>
-                            <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Token ( in headers ), classroomName <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-info""> Route </span> :  <p class="bg-dark rounded p-3 pl-4 text-info">http://localhost:3000/users/createclass</p> </p>
+                            <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Token ( in headers ), classroomName <pre class="bg-dark rounded text-warning">
                                 
     axios.post(`${url}users/createclass`,{
                     classroomName
                 },{ params:{}, headers: { 'auth-token': token } })
                             </pre></p>
-                            <p> <span class="badge badge-success""> Return Data </span> : On each successful request, data will be returned as following <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-success""> Return Data </span> : On each successful request, data will be returned as following <pre class="bg-dark rounded text-warning">
     
     {
         classroomName: <span class="text-info">classroomName</span> ,
@@ -230,7 +230,7 @@
         owner: <span class="text-info">email</span>
     }
                             </pre> </p>
-                            <p> <span class="badge badge-danger""> Failed Data </span> : On each insuccessful request, data will be returned as following <pre class="bg-secondary rounded text-warning">
+                            <p> <span class="badge badge-danger""> Failed Data </span> : On each insuccessful request, data will be returned as following <pre class="bg-dark rounded text-warning">
             
     {
         message : err.message
