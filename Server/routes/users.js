@@ -92,8 +92,17 @@ router.post("/joinclass", verify , async (req, res) => {
     //Require 2 data  {email, code}
    try{
         const _class = await _Class.findOne({code : req.body.code})
+
+
         //Check if the class is actually exist
         if (_class){
+            // Check if the class is private
+            if (_class.isPrivate){
+                //Validate class password
+                if (_class.pwd !== req.password){
+                    return res.json({message : "Password incorrect"})
+                }
+            }           
             // update classParticipated in user's object 
             const updatedUser = await User.updateOne({email:req.user.email}, {$addToSet: { classParticipated: req.body.code }})
             // Check if one array has been added or not, if not, class is already joined!
@@ -178,6 +187,73 @@ router.post("/startStream", verify, async (req, res) => {
     }
 })
 
+router.post("/joinStream", verify, async(req,res) => {
+    const email = req.user.email
+    const name = req.user.name
+    const streamCode = req.body.streamCode
+    const code = req.body.code
+    const domain = 'meet.jit.si';
+    
+    try{
+        // Get Class Info
+        const _class = await _Class.findOne({code})
+        
+        // Check if class is actually exist
+        if (!_class){
+            res.json({message:"Class not found!"})
+        }
+
+        // Check if the stream is online
+        if (_class.currentlyStreaming === streamCode){
+            // Check ownership
+            if (_class.owner === email){ // Owner
+                // For Streamer/Lecturer
+                const interfaceConfigLecturer = {
+                    SETTINGS_SECTIONS: ['devices', 'language', 'moderator'],
+                    SHOW_JITSI_WATERMARK: false,
+                    SHOW_WATERMARK_FOR_GUESTS: false,
+                }
+                const options = {
+                    roomName: streamCode,
+                    interfaceConfigOverwrite : interfaceConfigLecturer,
+                    userInfo : {
+                        email : email
+                    }
+                }
+                res.json({options : options, domain : domain, role : "Lecturer", name : name})
+            }else{ // Not-Owner
+                // For Stream Participant - **Not Class Owner**
+                const interfaceConfigStudent = {
+                    TOOLBAR_BUTTONS: [
+                        'closedcaptions', 'fullscreen',
+                        'recording',
+                        'etherpad', 'settings', 'raisehand',
+                        'videoquality', 'feedback', 'stats', 'shortcuts',
+                        'tileview', 'download'
+                    ],
+                    SETTINGS_SECTIONS: ['devices', 'language', 'moderator'],
+                    SHOW_JITSI_WATERMARK: false,
+                    SHOW_WATERMARK_FOR_GUESTS: false,
+                }
+                const optionsStudents = {
+                    roomName: streamCode,
+                    interfaceConfigOverwrite : interfaceConfigStudent,
+                    userInfo : {
+                        email : email
+                    }
+                };
+                // Send Back Data Lah
+                res.json({options : optionsStudents, domain : domain, role : "Student", name : name})
+            }
+        }else{
+            res.json({message : "Stream is not available. Please Contact the streamer!"})
+        }
+    }catch(err){
+        res.json({message:err})
+    }
+
+})
+
 // Stop stream
 router.post("/stopStream", verify, async (req, res) => {
     const code = req.body.code
@@ -214,8 +290,6 @@ router.get("/getCurrentStream", verify , async (req, res) => {
     }
 
 })
-
-//  
 
 //Get specific user (Obsolete)
 router.get("/:postId", verify , async (req , res) => {

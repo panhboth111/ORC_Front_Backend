@@ -50,12 +50,14 @@ router.post("/login", async (req , res ) => {
     const existUser = await Credential.findOne({email:email})
     //Check if the user is exist
     if (!existUser) return res.json({"message" : "Email does not exist"})
+    //Get Username
+    const user = await User.findOne({email})
     //Validate encrypted pass
     const validPass = bcrypt.compare(pwd , existUser.pwd , (err, isMatch) => {
         if (err) return res.json({"message" : err})
         if (isMatch){ // if the pwd matches 
             // Sign the token
-            const token = jwt.sign({email : email}, process.env.TOKEN_SECRET)
+            const token = jwt.sign({email : email, name: user.name}, process.env.TOKEN_SECRET)
             //Put token in the header
             return res.header("auth-token",token).json({"message" : "Login Success", "token" : token})
         }else{ // if the pwd is not match
