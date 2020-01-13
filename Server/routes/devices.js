@@ -55,7 +55,7 @@ const deviceManagement = (io) => {
                     }).save()
                     const classes = await Class.find()
                     await Class.updateMany({},{$addToSet: { members: `${id}@device.com` }})
-                    classes.map(c => await User.updateOne({email:`${id}@device.com`},{$addToSet: { classParticipated: c.code }}) )
+                    classes.map(async (c) => await User.updateOne({email:`${id}@device.com`},{$addToSet: { classParticipated: c.code }}) )
                     device.emit('update_id',id)                
                }catch(err){
                     if(err.code == 11000){ //if the primary keys are not unique, it will throw the 11000 error, so we need to re-insert the information
@@ -89,7 +89,7 @@ const deviceManagement = (io) => {
                         }).save()
                         const classes = await Class.find()
                         await Class.updateMany({},{$addToSet: { members: `${id}@device.com` }})
-                        classes.map(c => await User.updateOne({email:`${id}@device.com`},{$addToSet: { classParticipated: c.code }}) )
+                        classes.map(async c => await User.updateOne({email:`${id}@device.com`},{$addToSet: { classParticipated: c.code }}) )
                         device.emit('update_id',id)
                     }
                }
@@ -118,6 +118,7 @@ const deviceManagement = (io) => {
             const {deviceId,deviceName} = req.body
             const socket = await Device.findOne({deviceId})
             await Device.updateOne({deviceId},{deviceName})
+            await Class.updateOne({deviceId},{classroomName:deviceName})
             io.to(socket.socketId).emit('change_name',deviceName)
             res.send(socket.socketId)
         }catch(err){
