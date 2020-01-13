@@ -3,9 +3,10 @@ const mongoose = require('mongoose')
 const schema = mongoose.Schema({
     deviceName:String,
     deviceId:String,
+    socketId:String,
     streaming:Boolean,
     cameraPlugged:Boolean,
-    online:false
+    online:Boolean
 })
 
-module.exports = mongoose.model('Devices',schema)
+module.exports = mongoose.model('Device',schema)
