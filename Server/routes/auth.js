@@ -57,7 +57,7 @@ router.post("/login", async (req , res ) => {
         if (err) return res.json({err})
         if (isMatch){ // if the pwd matches 
             // Sign the token
-            const token = jwt.sign({email : email, name: user.name}, process.env.TOKEN_SECRET)
+            const token = jwt.sign({email : email, name: user.name, role:existUser.role}, process.env.TOKEN_SECRET)
             //Put token in the header
             return res.header("auth-token",token).json({"message" : "Login Success", "token" : token})
         }else{ // if the pwd is not match

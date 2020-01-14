@@ -13,7 +13,8 @@ const schema = mongoose.Schema({
         default : ""
     },
     members: Array,
-    owner: String
+    owner: String,
+    ownerName : String,
 })
 
 

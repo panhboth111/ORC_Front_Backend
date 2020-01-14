@@ -110,7 +110,7 @@ export default {
       this.isLoading = true
       const message = await backend.login(this.email, this.password)
       if (message){
-        alert(message.message)
+        alert(message.messagexx)
       }else{
         localStorage.setItem("LastLogged",Date.now())
       }

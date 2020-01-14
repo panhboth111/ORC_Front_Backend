@@ -50,7 +50,16 @@ router.get("/class", verify , async (req , res) => {
 router.get("/user", verify , async (req, res) => {
     const email = req.user.email
     const user = await User.findOne({email})
-    res.json(user)
+    const {classOwnerShip,classParticipated,name} = user
+    const _user = {
+        classOwnerShip,
+        classParticipated,
+        email,
+        name,
+        role:req.user.role
+    }
+    
+    res.json(_user)
 })
 
 //Get data for creating class
@@ -65,7 +74,8 @@ router.post("/createClass", verify , async (req, res) => {
             password : req.body.password,
             currentlyStreaming: "",
             members: [],
-            owner: req.user.email
+            owner: req.user.email,
+            ownerName : req.user.name
         })
         // Update user classOwnerShip and classParticipated
         const updateUser = await User.updateOne({email:req.user.email}, {$addToSet: { classOwnerShip: code , classParticipated: code} })
