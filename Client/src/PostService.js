@@ -27,7 +27,7 @@ class PostService{
     }
 
     // Create a new class for the current user
-    static createClass( classroomName){
+    static createClass(classroomName){
         const token = cookie.getCookie("auth-token") //window.localStorage.getItem("auth-token")
         if (classroomName != null && classroomName != ""){
             return axios.post(`${url}users/createclass`,{

@@ -213,10 +213,10 @@
                       <div class="card-body">
                         <p>
                             <p> <span class="badge badge-info""> Description </span> :  Create a new class which will be owned by the current user. Parameter including <span class="text-warning">password</span> can be passed as an empty string in case <span class="text-warning">isPrivate</span> is false.</p>
-                            <p> <span class="badge badge-info""> Route </span> :  <p class="bg-dark rounded p-3 pl-4 text-info">http://localhost:3000/users/createclass</p> </p>
+                            <p> <span class="badge badge-info""> Route </span> :  <p class="bg-dark rounded p-3 pl-4 text-info">http://localhost:3000/users/createClass</p> </p>
                             <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Token ( in headers ), classroomName, isPrivate, password <pre class="bg-dark rounded text-warning">
                                 
-    axios.post(`http://localhost:3000/users/createclass`,{
+    axios.post(`http://localhost:3000/users/createClass`,{
                     classroomName,
                     isPrivate,
                     password
@@ -259,10 +259,10 @@
                     <div class="card-body">
                       <p>
                           <p> <span class="badge badge-info""> Description </span> :  Put the current as the member of the classroom. Parameter including <span class="text-warning">password</span> can be passed as an empty string in case the class is public.</p>
-                          <p> <span class="badge badge-info""> Route </span> :  <p class="bg-dark rounded p-3 pl-4 text-info">http://localhost:3000/users/joinclass</p> </p>
+                          <p> <span class="badge badge-info""> Route </span> :  <p class="bg-dark rounded p-3 pl-4 text-info">http://localhost:3000/users/joinClass</p> </p>
                           <p> <span class="badge badge-warning""> AXIOS Parameters </span> :  Token ( in headers ), code, password <pre class="bg-dark rounded text-warning">
                               
-  axios.post(`http://localhost:3000/users/joinclass`,{
+  axios.post(`http://localhost:3000/users/joinClass`,{
                   code,
                   password
               },{ params:{}, headers: { 'auth-token': <span class="text-info">token</span> } })

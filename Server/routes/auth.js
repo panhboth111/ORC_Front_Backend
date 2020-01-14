@@ -12,7 +12,7 @@ const _Class = require("../models/class")
 router.post("/signUp", async (req , res ) => {
     await bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(req.body.pwd, salt, async (err, hash) => {
-            if (err) return res.json({"message" : err})
+            if (err) return res.json({err})
 
             try{
                 const user = new User({
@@ -33,7 +33,7 @@ router.post("/signUp", async (req , res ) => {
                 if (err.code == 11000){
                     res.json({"message" : "Email is already registered!"})
                 }
-                res.json({"message" : err.message}) 
+                res.json({err}) 
             }
         })
     })
@@ -50,11 +50,11 @@ router.post("/login", async (req , res ) => {
     const existUser = await Credential.findOne({email:email})
     //Check if the user is exist
     if (!existUser) return res.json({"message" : "Email does not exist"})
-    //Get Username
+    //Get User to get the username later
     const user = await User.findOne({email})
     //Validate encrypted pass
     const validPass = bcrypt.compare(pwd , existUser.pwd , (err, isMatch) => {
-        if (err) return res.json({"message" : err})
+        if (err) return res.json({err})
         if (isMatch){ // if the pwd matches 
             // Sign the token
             const token = jwt.sign({email : email, name: user.name}, process.env.TOKEN_SECRET)

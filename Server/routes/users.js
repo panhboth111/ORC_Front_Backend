@@ -42,9 +42,7 @@ router.get("/class", verify , async (req , res) => {
         res.json({classOwnerShip , classParticipated})
         
     }catch(err){
-        res.json({
-            message : err
-        })       
+        res.json({err})       
     }
 })
 
@@ -56,7 +54,7 @@ router.get("/user", verify , async (req, res) => {
 })
 
 //Get data for creating class
-router.post("/createclass", verify , async (req, res) => {
+router.post("/createClass", verify , async (req, res) => {
     // Require 2 parameters {classroomName, email}
     try{
         const code = uID(6) // Create a unique keyCode for classroom **Might be duplicated**
@@ -81,14 +79,12 @@ router.post("/createclass", verify , async (req, res) => {
             const data = axio.post("http://localhost:3000/users/createclass", req.body, { params:{}, headers: { 'auth-token': req.header('auth-token') } })
             res.json(data.data)
         }
-        res.json({
-            message : err
-        })
+        res.json({err})
     }
 })
 
 // Join a class
-router.post("/joinclass", verify , async (req, res) => {
+router.post("/joinClass", verify , async (req, res) => {
     //Require 2 data  {email, code}
    try{
         const _class = await _Class.findOne({code : req.body.code})
@@ -121,9 +117,7 @@ router.post("/joinclass", verify , async (req, res) => {
             })
         }
    }catch(err){
-        res.json({
-            message : err
-        })
+        res.json({err})
    }
 })
 
@@ -145,7 +139,7 @@ router.post("/deleteClass", verify , async (req,res)=>{
         }
 
     }catch(err){
-        res.send({"message" : err})   
+        res.send({err})   
     }
 })
 
@@ -183,7 +177,7 @@ router.post("/startStream", verify, async (req, res) => {
 
         res.json(savedStream)
     }catch (err){
-        res.json({"message" : err})
+        res.json({err})
     }
 })
 
@@ -249,7 +243,7 @@ router.post("/joinStream", verify, async(req,res) => {
             res.json({message : "Stream is not available. Please Contact the streamer!"})
         }
     }catch(err){
-        res.json({message:err})
+        res.json({err})
     }
 
 })
@@ -263,7 +257,7 @@ router.post("/stopStream", verify, async (req, res) => {
         await _Class.updateOne({code,owner},{currentlyStreaming : ""})
         res.json({"message" : "stopped the stream as successfully"})
     }catch(err){
-        res.json({"message" : err})
+        res.json({err})
     }
 })
 
@@ -286,7 +280,7 @@ router.get("/getCurrentStream", verify , async (req, res) => {
         }      
         res.json(streams)
     }catch(err){
-        res.json({"message" : "an Error occured " + err})
+        res.json({err})
     }
 
 })
