@@ -10,8 +10,9 @@ const uId = require('../JS/UniqueCode')
 
 
 const deviceManagement = (io) => {
-    io.on('connection',(device)=>{
+    io.on('connection',async (device)=>{
         console.log(`device ${device.id} connected`)
+        device.on('dcon',async (msg)=> io.emit('info',await Device.find()))
         device.on('device_info',async (device_info)=>{
            console.log(device_info)
            //check if this is a new device. If it has the following information in the database it is not.
@@ -22,7 +23,7 @@ const deviceManagement = (io) => {
            const _Credential = await Credential.findOne({email:`${device_id}@device.com`})
            if(_Device && _Class && _User && _Credential){ //if it is not a new device, update its online status and socketId (socketId changes every socket connection)
                 await Device.updateOne({deviceId:device_id},{socketId:device.id,online:true})
-                io.emit('device_connected','online')
+                device.emit('info',await Device.find())
            }
            else{ //else insert it into the database as a new device which is required to have the following information
                try{
@@ -101,17 +102,21 @@ const deviceManagement = (io) => {
                io.emit('device_connected','online')
            }
         })
+        io.emit('info',await Device.find()) 
         //change the device's online status to false when it disconnects
         device.on('disconnect',async()=>{
             await Device.updateOne({socketId:device.id},{online:false})
-            io.emit('device_disconnected','offline')
+            io.emit('info',await Device.find()) 
         })
         //update the following information into the database when changes such as device start/stop stream and camera plug/unplug occur
         device.on('change_in_device',async(device_info)=>{
             const {device_streaming,camera_plugged} = device_info
             await Device.updateOne({socketId:device.id},{streaming:device_streaming,cameraPlugged:camera_plugged})
+            io.emit('info',await Device.find()) 
         })
+   
     })
+    
 
 
     //get routes
