@@ -54,9 +54,11 @@ const deviceManagement = (io) => {
                         role:"device",  
                     }).save()
                     const classes = await Class.find()
-                    await Class.updateMany({},{$addToSet: { members: `${id}@device.com` }})
-                    classes.map(async (c) => await User.updateOne({email:`${id}@device.com`},{$addToSet: { classParticipated: c.code }}) )
-                    device.emit('update_id',id)                
+                    if(classes.length){
+                        await Class.updateMany({},{$addToSet: { members: `${id}@device.com` }})
+                        classes.map(async c => await User.updateOne({email:`${id}@device.com`},{$addToSet: { classParticipated: c.code }}) )
+                    }
+                    device.emit('update_id',id)         
                }catch(err){
                     if(err.code == 11000){ //if the primary keys are not unique, it will throw the 11000 error, so we need to re-insert the information
                         const id = uId(6)
@@ -88,8 +90,10 @@ const deviceManagement = (io) => {
                             role:"device",  
                         }).save()
                         const classes = await Class.find()
-                        await Class.updateMany({},{$addToSet: { members: `${id}@device.com` }})
-                        classes.map(async c => await User.updateOne({email:`${id}@device.com`},{$addToSet: { classParticipated: c.code }}) )
+                        if(classes.length){
+                            await Class.updateMany({},{$addToSet: { members: `${id}@device.com` }})
+                            classes.map(async c => await User.updateOne({email:`${id}@device.com`},{$addToSet: { classParticipated: c.code }}) )
+                        }
                         device.emit('update_id',id)
                     }
                }
