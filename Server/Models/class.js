@@ -15,6 +15,10 @@ const schema = mongoose.Schema({
     members: Array,
     owner: String,
     ownerName : String,
+    isDevice:{
+        type:Boolean,
+        default:false
+    }
 })
 
 
