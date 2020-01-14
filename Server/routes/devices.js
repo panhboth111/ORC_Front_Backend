@@ -22,6 +22,7 @@ const deviceManagement = (io) => {
            const _Credential = await Credential.findOne({email:`${device_id}@device.com`})
            if(_Device && _Class && _User && _Credential){ //if it is not a new device, update its online status and socketId (socketId changes every socket connection)
                 await Device.updateOne({deviceId:device_id},{socketId:device.id,online:true})
+                io.emit('device_connected','online')
            }
            else{ //else insert it into the database as a new device which is required to have the following information
                try{
@@ -97,11 +98,13 @@ const deviceManagement = (io) => {
                         device.emit('update_id',id)
                     }
                }
+               io.emit('device_connected','online')
            }
         })
         //change the device's online status to false when it disconnects
         device.on('disconnect',async()=>{
             await Device.updateOne({socketId:device.id},{online:false})
+            io.emit('device_disconnected','offline')
         })
         //update the following information into the database when changes such as device start/stop stream and camera plug/unplug occur
         device.on('change_in_device',async(device_info)=>{

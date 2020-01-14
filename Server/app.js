@@ -7,7 +7,7 @@ const {deviceManagement,deviceRoute} = require('./routes/devices')
 
 require('dotenv/config');
 
-const PORT = 5000 || process.env.PORT 
+const PORT = 3000 || process.env.PORT 
 
 const app = express();
 const server = app.listen(PORT,()=> {
@@ -37,10 +37,10 @@ app.get('/', (req, res) => {
 
 //Connect to DB
 const DB_CONNECTION =  process.env.DB_CONNECTION || 'mongodb://localhost:27017/testing' 
-mongoose.connect(DB_CONNECTION, {useNewUrlParser: true, useUnifiedTopology: true},() => console.log("Database connection established"));
+mongoose.connect(DB_CONNECTION, {useNewUrlParser: true, useUnifiedTopology: true},() => console.log("Database connection established"))
+;
 
 //DeviceManagement
-
 deviceManagement(io) //pass io to use in the user-defined function
 
 
