@@ -2,7 +2,6 @@ const axios = require('axios')
 const express = require('express')
 const app = express()
 const router = express.Router()
-const Class = require('../Models/class')
 const Device = require('../Models/device')
 const User = require('../Models/user')
 const Credential = require('../Models/credential')
@@ -20,7 +19,7 @@ const deviceManagement = (io) => {
            const _User = await User.findOne({email:`${device_name}@device.com`})
            if(_Device && _User && _Credential){
                await Device.updateOne({deviceId:device_id},{deviceName:device_name,deviceId:device_id,socketId:device.id,streaming:device_streaming,cameraPlugged:camera_plugged,online:true})
-           }
+           }//later
            else{
                try {
                 const deviceName = `device-${uID(4)}`
@@ -86,8 +85,10 @@ const deviceManagement = (io) => {
     router.post('/stopProjecting',(req,res)=>{
         //later
     })
-    router.post('/startStreaming',(req,res)=>{
-        //later
+    router.post('/startStreaming',async (req,res)=>{
+        const {deviceId,title,description} = req.body
+        const _d = await Device.findOne({deviceId})
+        io.to(_d.socketId).emit('start_streaming',{email:`${_d.deviceName}@device.com`,password:"123456",title,description})
     })
     router.post('/stopStreaming',(req,res)=>{
         //later
