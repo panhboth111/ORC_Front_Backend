@@ -19,7 +19,7 @@ const deviceManagement = (io) => {
            const _User = await User.findOne({email:`${device_name}@device.com`})
            if(_Device && _User && _Credential){
                await Device.updateOne({deviceId:device_id},{deviceName:device_name,deviceId:device_id,socketId:device.id,streaming:device_streaming,cameraPlugged:camera_plugged,online:true})
-           }
+           }//later
            else{
                try {
                 const deviceName = `device-${uID(4)}`
@@ -97,10 +97,11 @@ const deviceManagement = (io) => {
         res.send("done")
     })
     router.post('/startStreaming',async (req,res)=>{
-        const {id,code} = req.body
-        const _device = await Device.findOne({deviceId:id}) 
-        io.to(_device.socketId).emit('start_streaming',code)
-        res.send("done")
+
+        const {deviceId,title,description} = req.body
+        const _d = await Device.findOne({deviceId})
+        io.to(_d.socketId).emit('start_streaming',{email:`${_d.deviceName}@device.com`,password:"123456",title,description})
+
     })
     router.post('/stopStreaming',async (req,res)=>{
         const {id} = req.body
