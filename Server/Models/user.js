@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 
 const schema = mongoose.Schema({
-    classOwnerShip : Array,
-    classParticipated : Array,
     email : {
         type : String,
         required : true

@@ -72,6 +72,7 @@ const deviceManagement = (io) => {
             await User.updateOne({deviceId},{email:`${deviceName}@device.com`})
             await Credential.updateOne({deviceId},{email: `${deviceName}@device.com`})
             io.to(socket.socketId).emit('change_name',deviceName)
+            io.emit('info',await Device.find())
             res.send(socket.socketId)
         }catch(err){
             res.send({msg:err})
@@ -80,18 +81,33 @@ const deviceManagement = (io) => {
 
     //post routes
     router.post('/startProjecting',(req,res)=>{
-        //later
+        const {ids,code} = req.body
+        ids.map(async (deviceId) => {
+            const _device = await Device.findOne({deviceId})
+            io.to(_device.socketId).emit('start_projecting',code)
+        })
+        res.send("done")
     })
     router.post('/stopProjecting',(req,res)=>{
-        //later
+        const {ids} = req.body
+        ids.map(async (deviceId) => {
+            const _device = await Device.findOne({deviceId})
+            io.to(_device.socketId).emit('stop_projecting','')
+        })
+        res.send("done")
     })
     router.post('/startStreaming',async (req,res)=>{
+
         const {deviceId,title,description} = req.body
         const _d = await Device.findOne({deviceId})
         io.to(_d.socketId).emit('start_streaming',{email:`${_d.deviceName}@device.com`,password:"123456",title,description})
+
     })
-    router.post('/stopStreaming',(req,res)=>{
-        //later
+    router.post('/stopStreaming',async (req,res)=>{
+        const {id} = req.body
+        const _device = await Device.findOne({deviceId:id}) 
+        io.to(_device.socketId).emit('stop_streaming')
+        res.send("done")
     })
 }
 

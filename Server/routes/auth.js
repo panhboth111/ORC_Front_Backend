@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const User = require("../Models/user")
 const Credential = require("../Models/credential")
-const _Class = require("../Models/class")
 
 
 //Get Data for sign up
@@ -16,8 +15,6 @@ router.post("/signUp", async (req , res ) => {
 
             try{
                 const user = new User({
-                    classOwnerShip : [],
-                    classParticipated : [],
                     email : req.body.email,
                     name : req.body.name
                 });
@@ -25,10 +22,10 @@ router.post("/signUp", async (req , res ) => {
                     email : req.body.email,
                     pwd : hash
                 })
-                console.log(user)        
+
                 const savedUser = await user.save();
                 const savedCredential = await credential.save();
-                res.json(savedUser);
+                res.json(savedCredential);
             }catch(err){
                 if (err.code == 11000){
                     res.json({"message" : "Email is already registered!"})
@@ -45,6 +42,7 @@ router.post("/signUp", async (req , res ) => {
 router.post("/login", async (req , res ) => {
     const email = req.body.email
     const pwd = req.body.pwd
+    console.log("New Login from : "+email)
     // console.log(email + " " + pwd)
 
     const existUser = await Credential.findOne({email:email})
