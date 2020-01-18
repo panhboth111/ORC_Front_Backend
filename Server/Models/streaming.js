@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
 const schema = mongoose.Schema({
-    code : {
-        type : String,
-        required : true
-    },
     streamCode : {
         type : String,
         required : true
@@ -13,13 +9,33 @@ const schema = mongoose.Schema({
         type : String,
         required : true
     },
+    description : {
+        type : String,
+        required : true
+    },
+    isPrivate : {
+        type : String,
+        default : false
+    },
+    password : {
+        type : String,
+        default : ""
+    },
     owner : {
+        type : String,
+        required : true
+    },
+    ownerName :{
         type : String,
         required : true
     },
     date : {
         type : Date,
         default : Date.now
+    },
+    isActive : {
+        type : Boolean,
+        default : true
     }
 })
 

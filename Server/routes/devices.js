@@ -2,10 +2,7 @@ const axios = require('axios')
 const express = require('express')
 const app = express()
 const router = express.Router()
-const Class = require('../Models/class')
 const Device = require('../Models/device')
-const User = require('../Models/user')
-const Credential = require('../Models/credential')
 const uId = require('../JS/UniqueCode')
 
 
@@ -18,10 +15,7 @@ const deviceManagement = (io) => {
            //check if this is a new device. If it has the following information in the database it is not.
            const {device_name,device_id,device_streaming,camera_plugged} = device_info
            const _Device = await Device.findOne({deviceId:device_id})
-           const _Class = await Class.findOne({owner:`${device_id}@device.com`})
-           const _User = await User.findOne({email:`${device_id}@device.com`})
-           const _Credential = await Credential.findOne({email:`${device_id}@device.com`})
-           if(_Device && _Class && _User && _Credential){ //if it is not a new device, update its online status and socketId (socketId changes every socket connection)
+           if(_Device){ //if it is not a new device, update its online status and socketId (socketId changes every socket connection)
                 await Device.updateOne({deviceId:device_id},{socketId:device.id,online:true})
                 device.emit('info',await Device.find())
            }
@@ -36,33 +30,9 @@ const deviceManagement = (io) => {
                         cameraPlugged:camera_plugged,
                         online:true
                     }).save()
-                    await new Class({
-                        classroomName:device_name,
-                        code:"123456",
-                        password:"123456",
-                        members:[],
-                        owner:`${id}@device.com`,
-                        isDevice:true
-                    }).save()
-                    await new User({
-                        classOwnerShip:[],
-                        classParticipated:[],
-                        email:`${id}@device.com`,
-                        name:device_name
-                    }).save()
-                    await new Credential({
-                        email:`${id}@device.com`,
-                        pwd:"123456",
-                        role:"device",  
-                    }).save()
-                    const classes = await Class.find()
-                    if(classes.length){
-                        await Class.updateMany({},{$addToSet: { members: `${id}@device.com` }})
-                        classes.map(async c => await User.updateOne({email:`${id}@device.com`},{$addToSet: { classParticipated: c.code }}) )
-                    }
                     device.emit('update_id',id)         
                }catch(err){
-                    if(err.code == 11000){ //if the primary keys are not unique, it will throw the 11000 error, so we need to re-insert the information
+                    if(err.code == 11000){ //if the primary key is not unique, it will throw the 11000 error, so we need to re-insert the information
                         const id = uId(6)
                         await new Device({
                             deviceName:device_name,
@@ -72,34 +42,9 @@ const deviceManagement = (io) => {
                             cameraPlugged:camera_plugged,
                             online:true
                         }).save()
-                        await new Class({
-                            classroomName:device_name,
-                            code:"123456",
-                            password:"123456",
-                            members:[],
-                            owner:`${id}@device.com`,
-                            isDevice:true
-                        }).save()
-                        await new User({
-                            classOwnerShip:[],
-                            classParticipated:[],
-                            email:`${id}@device.com`,
-                            name:device_name
-                        }).save()
-                        await new Credential({
-                            email:`${id}@device.com`,
-                            pwd:"123456",
-                            role:"device",  
-                        }).save()
-                        const classes = await Class.find()
-                        if(classes.length){
-                            await Class.updateMany({},{$addToSet: { members: `${id}@device.com` }})
-                            classes.map(async c => await User.updateOne({email:`${id}@device.com`},{$addToSet: { classParticipated: c.code }}) )
-                        }
                         device.emit('update_id',id)
                     }
                }
-               io.emit('device_connected','online')
            }
         })
         io.emit('info',await Device.find()) 
@@ -130,8 +75,8 @@ const deviceManagement = (io) => {
             const {deviceId,deviceName} = req.body
             const socket = await Device.findOne({deviceId})
             await Device.updateOne({deviceId},{deviceName})
-            await Class.updateOne({deviceId},{classroomName:deviceName})
             io.to(socket.socketId).emit('change_name',deviceName)
+            io.emit('info',await Device.find())
             res.send(socket.socketId)
         }catch(err){
             res.send({msg:err})
@@ -140,16 +85,32 @@ const deviceManagement = (io) => {
 
     //post routes
     router.post('/startProjecting',(req,res)=>{
-        //later
+        const {ids,code} = req.body
+        ids.map(async (deviceId) => {
+            const _device = await Device.findOne({deviceId})
+            io.to(_device.socketId).emit('start_projecting',code)
+        })
+        res.send("done")
     })
     router.post('/stopProjecting',(req,res)=>{
-        //later
+        const {ids} = req.body
+        ids.map(async (deviceId) => {
+            const _device = await Device.findOne({deviceId})
+            io.to(_device.socketId).emit('stop_projecting','')
+        })
+        res.send("done")
     })
-    router.post('/startStreaming',(req,res)=>{
-        //later
+    router.post('/startStreaming',async (req,res)=>{
+        const {id,code} = req.body
+        const _device = await Device.findOne({deviceId:id}) 
+        io.to(_device.socketId).emit('start_streaming',code)
+        res.send("done")
     })
-    router.post('/stopStreaming',(req,res)=>{
-        //later
+    router.post('/stopStreaming',async (req,res)=>{
+        const {id} = req.body
+        const _device = await Device.findOne({deviceId:id}) 
+        io.to(_device.socketId).emit('stop_streaming')
+        res.send("done")
     })
 }
 

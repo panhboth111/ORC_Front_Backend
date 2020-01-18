@@ -2,12 +2,11 @@ const express = require('express')
 const app = express()
 const axio = require('axios')
 const User = require("../Models/user")
-const Streaming = require('../Models/streaming')
 const _Class = require("../Models/class")
 const router = express.Router();
 const uID = require("../JS/UniqueCode")
 const verify = require("./verifyToken")
-const CurrentlyStreaming = require('../Models/currentlyStreaming')
+const Streaming = require('../Models/streaming')
 
 //Routes
 router.get("/", async (req , res) => {
@@ -175,10 +174,10 @@ router.post("/startStream", verify, async (req, res) => {
         // Check if stream code is available 
         do{
             streamCode = uID(12)
-            isNotUnique = await CurrentlyStreaming.findOne({streamCode})
+            isNotUnique = await Streaming.findOne({streamCode})
         }while(isNotUnique)
 
-        const newStream = new CurrentlyStreaming({
+        const newStream = new Streaming({
             streamCode,
             streamTitle,
             description,
@@ -208,66 +207,71 @@ router.post("/startStream", verify, async (req, res) => {
 
 })
 
+// Join Stream
 router.post("/joinStream", verify, async(req,res) => {
     const email = req.user.email
     const name = req.user.name
     const streamCode = req.body.streamCode
-    const code = req.body.code
+    const password = req.body.pwd
     const domain = 'meet.jit.si';
     
     try{
-        // Get Class Info
-        const _class = await _Class.findOne({code})
-        
-        // Check if class is actually exist
-        if (!_class){
-            res.json({message:"Class not found!"})
+        //Get stream info
+        const theStream = await Streaming.findOne({streamCode});
+        // Check Stream status
+        if (!theStream.isActive){
+            res.json({message : "Stream is not currently available", code : "ST-001"})
+        }
+        // Check Stream privacy
+        if (!theStream.isPrivate){
+            if (!password.equals("") && password.equals(null)){
+                if(!theStream.password.equals(password)){
+                    res.json({message : "Incorrect password", code : "ST-002"})
+                }
+            }else{
+                res.json({message : "Password is required", code : "ST-003"})
+            }     
         }
 
-        // Check if the stream is online
-        if (_class.currentlyStreaming === streamCode){
-            // Check ownership
-            if (_class.owner === email){ // Owner
-                // For Streamer/Lecturer
-                const interfaceConfigLecturer = {
-                    SETTINGS_SECTIONS: ['devices', 'language', 'moderator'],
-                    SHOW_JITSI_WATERMARK: false,
-                    SHOW_WATERMARK_FOR_GUESTS: false,
-                }
-                const options = {
-                    roomName: streamCode,
-                    interfaceConfigOverwrite : interfaceConfigLecturer,
-                    userInfo : {
-                        email : email
-                    }
-                }
-                res.json({options : options, domain : domain, role : "Lecturer", name : name})
-            }else{ // Not-Owner
-                // For Stream Participant - **Not Class Owner**
-                const interfaceConfigStudent = {
-                    TOOLBAR_BUTTONS: [
-                        'closedcaptions', 'fullscreen',
-                        'recording',
-                        'etherpad', 'settings', 'raisehand',
-                        'videoquality', 'feedback', 'stats', 'shortcuts',
-                        'tileview', 'download'
-                    ],
-                    SETTINGS_SECTIONS: ['devices', 'language', 'moderator'],
-                    SHOW_JITSI_WATERMARK: false,
-                    SHOW_WATERMARK_FOR_GUESTS: false,
-                }
-                const optionsStudents = {
-                    roomName: streamCode,
-                    interfaceConfigOverwrite : interfaceConfigStudent,
-                    userInfo : {
-                        email : email
-                    }
-                };
-                // Send Back Data Lah
-                res.json({options : optionsStudents, domain : domain, role : "Student", name : name})
+        // Check ownership
+        if (theStream.owner === email){ // Owner
+            // For Streamer/Lecturer
+            const interfaceConfigLecturer = {
+                SETTINGS_SECTIONS: ['devices', 'language', 'moderator'],
+                SHOW_JITSI_WATERMARK: false,
+                SHOW_WATERMARK_FOR_GUESTS: false,
             }
-        }else{
-            res.json({message : "Stream is not available. Please Contact the streamer!"})
+            const options = {
+                roomName: streamCode,
+                interfaceConfigOverwrite : interfaceConfigLecturer,
+                userInfo : {
+                email : email
+                }
+            }
+            res.json({options : options, domain : domain, role : "Lecturer", name : name})
+        }else{ // Not-Owner
+            // For Stream Participant - **Not Class Owner**
+            const interfaceConfigStudent = {
+                TOOLBAR_BUTTONS: [
+                    'closedcaptions', 'fullscreen',
+                    'recording',
+                    'etherpad', 'settings', 'raisehand',
+                    'videoquality', 'feedback', 'stats', 'shortcuts',
+                    'tileview', 'download'
+                ],
+                SETTINGS_SECTIONS: ['devices', 'language', 'moderator'],
+                SHOW_JITSI_WATERMARK: false,
+                SHOW_WATERMARK_FOR_GUESTS: false,
+            }
+            const optionsStudents = {
+                roomName: streamCode,
+                interfaceConfigOverwrite : interfaceConfigStudent,
+                userInfo : {
+                email : email
+             }
+        };
+            // Send Back Data Lah
+            res.json({options : optionsStudents, domain : domain, role : "Student", name : name})
         }
     }catch(err){
         res.json({err})
@@ -277,14 +281,30 @@ router.post("/joinStream", verify, async(req,res) => {
 
 // Stop stream
 router.post("/stopStream", verify, async (req, res) => {
-    const code = req.body.code
-    const owner = req.user.email
+    // const code = req.body.code
+    // const owner = req.user.email
    
+    // try{
+    //     await _Class.updateOne({code,owner},{currentlyStreaming : ""})
+    //     res.json({"message" : "stopped the stream as successfully"})
+    // }catch(err){
+    //     res.json({err})
+    // }
+    const streamCode = req.body.streamCode
+    const owner = req.user.email
+
     try{
-        await _Class.updateOne({code,owner},{currentlyStreaming : ""})
-        res.json({"message" : "stopped the stream as successfully"})
+
+        const theStream = await Streaming.updateOne({streamCode, owner},{isActive : false})
+        if (theStream){
+            if (theStream.n >= 1){
+                res.json({message:"Stop the stream with ID '" +streamCode+ "' as successfully"})
+            }
+        }else{
+            res.json({message:"Failed to stop the stream with ID : " + streamCode})
+        }
     }catch(err){
-        res.json({err})
+        res.json(err)
     }
 })
 
@@ -310,11 +330,28 @@ router.get("/getCurrentlyStream", verify , async (req, res) => {
     //     res.json({err})
     // }
         try{
-            const currentlyStreamings = await CurrentlyStreaming.find({});
+            const currentlyStreamings = await Streaming.find({isActive : true});
             res.json(currentlyStreamings)
         }catch(err){
             res.json(err)
         }
+
+})
+
+// Get Stream Detials
+router.post("/getStreamDetail", verify , async (req, res) => {
+    const streamCode = req.body.streamCode
+    try{
+        const theStream = await Streaming.findOne({streamCode})
+        console.log(theStream)
+        res.json({
+            streamTitle : theStream.streamTitle,
+            description : theStream.description,
+            ownerName : theStream.ownerName
+        })
+    }catch(err){
+        res.json(err)
+    }
 
 })
 
