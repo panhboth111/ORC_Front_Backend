@@ -42,6 +42,7 @@ router.post("/signUp", async (req , res ) => {
 router.post("/login", async (req , res ) => {
     const email = req.body.email
     const pwd = req.body.pwd
+    console.log("New Login from : "+email)
     // console.log(email + " " + pwd)
 
     const existUser = await Credential.findOne({email:email})
