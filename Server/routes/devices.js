@@ -25,16 +25,14 @@ const deviceManagement = (io) => {
                 const deviceName = `device-${uID(4)}`
                 const deviceId = `${uID(6)}`
                 await new Device({deviceName,deviceId,socketId:device.id,streaming:device_streaming,cameraPlugged:camera_plugged,online:true}).save()
-                await new User({classOwnerShip:[],classParticipated:[],email:`${deviceName}@device.com`}).save()
-                await new Credential({email:`${deviceName}@device.com`,pwd:"123456"}).save()
+                await axios.post('http://localhost:3000/auth/signUp',{email:`${deviceName}@device.com`,name:deviceName,pwd:"123456"})
                 device.emit('update_device_info',{deviceName,deviceId})
                } catch (error) {
                    if(error.code == 11000){
                         const deviceName = `device-${uID(4)}`
                         const deviceId = `${uID(6)}`
                         await new Device({deviceName,deviceId,socketId:device.id,streaming:device_streaming,cameraPlugged:camera_plugged,online:true}).save()
-                        await new User({classOwnerShip:[],classParticipated:[],email:`${deviceName}@device.com`}).save()
-                        await new Credential({email:`${deviceName}@device.com`,pwd:"123456"}).save()
+                        await axios.post('http://localhost:3000',{email:`${deviceName}@device.com`,name:deviceName,pwd:"123456"})
                         device.emit('update_device_info',{deviceName,deviceId})
                    }
                }
@@ -81,33 +79,48 @@ const deviceManagement = (io) => {
 
     //post routes
     router.post('/startProjecting',(req,res)=>{
-        const {ids,code} = req.body
-        ids.map(async (deviceId) => {
-            const _device = await Device.findOne({deviceId})
-            io.to(_device.socketId).emit('start_projecting',code)
-        })
-        res.send("done")
+        try{
+            const {deviceIds,streamId} = req.body
+            let _d
+            deviceIds.map(async (deviceId)=> {
+                _d = await Device.findOne({deviceId})
+                io.to(_d.socketId).emit('start_projecting',{email:`${_d.deviceName}@device.com`,password:"123456",streamId})
+            })
+            res.send("done") 
+        }catch(err){
+            res.send(err)
+        }
     })
     router.post('/stopProjecting',(req,res)=>{
-        const {ids} = req.body
-        ids.map(async (deviceId) => {
-            const _device = await Device.findOne({deviceId})
-            io.to(_device.socketId).emit('stop_projecting','')
-        })
-        res.send("done")
+        try{
+            const {deviceIds} = req.body
+            deviceIds.map(async (deviceId) => {
+                const _device = await Device.findOne({deviceId})
+                io.to(_device.socketId).emit('stop_projecting','')
+            })
+            res.send("done")
+        }catch(err){
+            res.send(err)
+        }
     })
     router.post('/startStreaming',async (req,res)=>{
-
-        const {deviceId,title,description} = req.body
-        const _d = await Device.findOne({deviceId})
-        io.to(_d.socketId).emit('start_streaming',{email:`${_d.deviceName}@device.com`,password:"123456",title,description})
-
+        try {
+            const {deviceId,title,description} = req.body
+            const _d = await Device.findOne({deviceId})
+            io.to(_d.socketId).emit('start_streaming',{email:`${_d.deviceName}@device.com`,password:"123456",title,description})
+        } catch (err) {
+            res.send(err)
+        }
     })
     router.post('/stopStreaming',async (req,res)=>{
-        const {id} = req.body
-        const _device = await Device.findOne({deviceId:id}) 
-        io.to(_device.socketId).emit('stop_streaming')
-        res.send("done")
+        try {
+            const {deviceId} = req.body
+            const _device = await Device.findOne({deviceId}) 
+            io.to(_device.socketId).emit('stop_streaming')
+            res.send("done")
+        } catch (err) {
+            res.send(err)
+        }
     })
 }
 
