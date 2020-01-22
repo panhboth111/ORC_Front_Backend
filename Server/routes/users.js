@@ -50,108 +50,15 @@ router.get("/class", verify , async (req , res) => {
 router.get("/user", verify , async (req, res) => {
     const email = req.user.email
     const user = await User.findOne({email})
-    const {classOwnerShip,classParticipated,name} = user
+    const {name,isStreaming} = user
     const _user = {
-        classOwnerShip,
-        classParticipated,
         email,
         name,
+        isStreaming,
         role:req.user.role
     }
-    
     res.json(_user)
 })
-
-// //Get data for creating class
-// router.post("/createClass", verify , async (req, res) => {
-//     // Require 2 parameters {classroomName, email}
-//     try{
-//         const code = uID(6) // Create a unique keyCode for classroom **Might be duplicated**
-//         const _class = new _Class({
-//             classroomName: req.body.classroomName,
-//             code: code,
-//             isPrivate : req.body.isPrivate,
-//             password : req.body.password,
-//             currentlyStreaming: "",
-//             members: [],
-//             owner: req.user.email,
-//             ownerName : req.user.name
-//         })
-//         // Update user classOwnerShip and classParticipated
-//         const updateUser = await User.updateOne({email:req.user.email}, {$addToSet: { classOwnerShip: code , classParticipated: code} })
-//         if (updateUser){
-//             const _savedClass = await _class.save()
-//             res.json(_savedClass)
-//         }
-//     }catch(err /* Catching duplicate primary key error*/ ){
-//         if (err.code == 11000 /*11000 is Duplicate key's error code*/){
-//             //Simulate a the same post to forge a new unique code
-//             const data = axio.post("http://localhost:3000/users/createclass", req.body, { params:{}, headers: { 'auth-token': req.header('auth-token') } })
-//             res.json(data.data)
-//         }
-//         res.json({err})
-//     }
-// })
-
-// // Join a class
-// router.post("/joinClass", verify , async (req, res) => {
-//     //Require 2 data  {email, code}
-//    try{
-//         const _class = await _Class.findOne({code : req.body.code})
-
-
-//         //Check if the class is actually exist
-//         if (_class){
-//             // Check if the class is private
-//             if (_class.isPrivate){
-//                 //Validate class password
-//                 if (_class.pwd !== req.password){
-//                     return res.json({message : "Password incorrect"})
-//                 }
-//             }           
-//             // update classParticipated in user's object 
-//             const updatedUser = await User.updateOne({email:req.user.email}, {$addToSet: { classParticipated: req.body.code }})
-//             // Check if one array has been added or not, if not, class is already joined!
-//             if (updatedUser.nModified == 0){
-//                 res.json({message : "Already join the class!"})
-//             }else{
-//                 // Add new member to the class object
-//                 await _Class.updateOne({code : req.body.code}, {$addToSet: { members: req.user.email }})
-//                 _class.members.push(req.user.email)
-//                 // Send back the class
-//                 res.json(_class)
-//             }
-//         }else{
-//             res.json({
-//                 message : "Class not found!"
-//             })
-//         }
-//    }catch(err){
-//         res.json({err})
-//    }
-// })
-
-// // Delete a class
-// router.post("/deleteClass", verify , async (req,res)=>{
-//     try{
-//         const {code} = req.body //pull class code from request body
-        
-//         // Check if the user own the class
-//         const _class = await _Class.findOne({code}) // get the desired class to delete
-//         if (_class.owner == req.user.email){
-//             await User.updateOne({email:_class.owner},{$pull:{classOwnerShip:{$in:[code]}}}) //remove ownership
-//             await User.updateOne({email:_class.owner},{$pull:{classOwnerShip:{$in:[code]}}}) //remove participation
-//             await User.updateMany({email:{$in:_class.members}},{$pull:{classParticipated:{$in:[code]}}},{multi:true}) //remove current memebers
-//             await _Class.deleteOne({code}) //delete class
-//             res.send({"message" : "Delete class as successfully"})
-//         }else{
-//             res.send({"message" : "You don't own the class"})
-//         }
-
-//     }catch(err){
-//         res.send({err})   
-//     }
-// })
 
 // Start stream
 router.post("/startStream", verify, async (req, res) => {
@@ -184,22 +91,12 @@ router.post("/startStream", verify, async (req, res) => {
             isPrivate,
             password,
             owner,
-            ownerName,
+            ownerName
         })
         const savedStream = await newStream.save()
         console.log(savedStream)
-        res.json(savedStream)
-    //     const newStream = new Streaming({
-    //         code,
-    //         streamCode,
-    //         streamTitle,
-    //         owner
-    //     })
-    //     const savedStream = await newStream.save()
-
-    //     await _Class.updateOne({code},{currentlyStreaming:streamCode})
-
-    //     res.json(savedStream)
+        await User.updateOne({email:owner},{isStreaming : true})
+        res.json({streamCode : savedStream.streamCode,streamTitle : savedStream.streamTitle, Description : savedStream.Description})
     }catch (err){
         console.log(err)
         res.json(err)
@@ -248,7 +145,8 @@ router.post("/joinStream", verify, async(req,res) => {
                 email : email
                 }
             }
-            res.json({options : options, domain : domain, role : "Lecturer", name : name})
+            await User.updateOne({email},{isStreaming : true})
+            res.json({options : options, domain : domain, role : "Lecturer", name : name, isStreaming : true})
         }else{ // Not-Owner
             // For Stream Participant - **Not Class Owner**
             const interfaceConfigStudent = {
@@ -270,9 +168,11 @@ router.post("/joinStream", verify, async(req,res) => {
                 email : email
              }
         };
+            await User.updateOne({email},{isStreaming : true})
             // Send Back Data Lah
             res.json({options : optionsStudents, domain : domain, role : "Student", name : name})
         }
+        
     }catch(err){
         res.json({err})
     }
@@ -280,28 +180,22 @@ router.post("/joinStream", verify, async(req,res) => {
 })
 
 // Stop stream
-router.post("/stopStream", verify, async (req, res) => {
-    // const code = req.body.code
-    // const owner = req.user.email
-   
-    // try{
-    //     await _Class.updateOne({code,owner},{currentlyStreaming : ""})
-    //     res.json({"message" : "stopped the stream as successfully"})
-    // }catch(err){
-    //     res.json({err})
-    // }
-    const streamCode = req.body.streamCode
+router.get("/stopStream", verify, async (req, res) => {
     const owner = req.user.email
-
+    
     try{
-
-        const theStream = await Streaming.updateOne({streamCode, owner},{isActive : false})
-        if (theStream){
-            if (theStream.n >= 1){
-                res.json({message:"Stop the stream with ID '" +streamCode+ "' as successfully"})
-            }
+        // Find the stream and set the active state to false
+        const result = await Streaming.updateOne({ owner , isActive : true },{ isActive : false })
+        if (result.n >= 1){
+            // Set isStreaming state of User to false
+            const result2 = await User.updateOne({email:owner},{isStreaming : false})
+            if (result2.n >= 1){
+                res.json({message : "Stop your current stream as successfully!", status : true})
+            }else{
+                res.json({message : "Problem Occured during stop streaming process", status : false})
+            }           
         }else{
-            res.json({message:"Failed to stop the stream with ID : " + streamCode})
+            res.json({message : "Problem Occured during stop streaming process", status : false})
         }
     }catch(err){
         res.json(err)
@@ -309,28 +203,11 @@ router.post("/stopStream", verify, async (req, res) => {
 })
 
 // Get currently stream of all class participated
-router.get("/getCurrentlyStream", verify , async (req, res) => {
-    // try{
-    //     const email = req.user.email
-    //     // Get User info
-    //     const user = await User.findOne({email})
-    //     // Get class participated 
-    //     const {classParticipated} = user
-
-    //     // Get class ** Needed optimization for class with currently streaming not equal to nothing
-    //     const classes = await _Class.find({code : {$in:classParticipated}})
-    //     var streams = []
-    //     for (var i = 0 ; i < classes.length ; i++ ){
-    //         if (classes[i].currentlyStreaming != "" && classes[i].currentlyStreaming != null){
-    //             streams.push(await Streaming.find({streamCode : classes[i].currentlyStreaming}))
-    //         } // ** Need optimization, should have tackle this in the class finding for only class that has currentlystreaming not empty
-    //     }      
-    //     res.json(streams)
-    // }catch(err){
-    //     res.json({err})
-    // }
+router.post("/getCurrentlyStream", verify , async (req, res) => {
+        var limit = req.body.limit == null ? 0 : req.body.limit
+        console.log(limit)
         try{
-            const currentlyStreamings = await Streaming.find({isActive : true});
+            const currentlyStreamings = await Streaming.find({isActive : true}).limit(limit);
             res.json(currentlyStreamings)
         }catch(err){
             res.json(err)

@@ -9,6 +9,10 @@ const schema = mongoose.Schema({
         type : String,
         require : true
     },
+    isStreaming : {
+        type : Boolean,
+        default : false
+    }
 })
 
 
