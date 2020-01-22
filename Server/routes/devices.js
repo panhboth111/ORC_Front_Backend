@@ -6,7 +6,6 @@ const Device = require('../Models/device')
 const User = require('../Models/user')
 const Credential = require('../Models/credential')
 const uID = require('../JS/UniqueCode')
-
 const deviceManagement = (io) => {
     io.on('connection',async (device)=>{
         console.log(`device ${device.id} connected`)
@@ -25,17 +24,15 @@ const deviceManagement = (io) => {
                 const deviceName = `device-${uID(4)}`
                 const deviceId = `${uID(6)}`
                 await new Device({deviceName,deviceId,socketId:device.id,streaming:device_streaming,cameraPlugged:camera_plugged,online:true}).save()
-                await new User({classOwnerShip:[],classParticipated:[],email:`${deviceName}@device.com`}).save()
-                await new Credential({email:`${deviceName}@device.com`,pwd:"123456"}).save()
+                await axios.post('http://localhost:3000/auth/signup',{email:`${deviceName}@device.com`,name:deviceName,pwd:"123456"})
                 device.emit('update_device_info',{deviceName,deviceId})
                } catch (error) {
                    if(error.code == 11000){
-                        const deviceName = `device-${uID(4)}`
-                        const deviceId = `${uID(6)}`
-                        await new Device({deviceName,deviceId,socketId:device.id,streaming:device_streaming,cameraPlugged:camera_plugged,online:true}).save()
-                        await new User({classOwnerShip:[],classParticipated:[],email:`${deviceName}@device.com`}).save()
-                        await new Credential({email:`${deviceName}@device.com`,pwd:"123456"}).save()
-                        device.emit('update_device_info',{deviceName,deviceId})
+                    const deviceName = `device-${uID(4)}`
+                    const deviceId = `${uID(6)}`
+                    await new Device({deviceName,deviceId,socketId:device.id,streaming:device_streaming,cameraPlugged:camera_plugged,online:true}).save()
+                    await axios.post('http://localhost:3000/auth/signup',{email:`${deviceName}@device.com`,name:deviceName,pwd:"123456"})
+                    device.emit('update_device_info',{deviceName,deviceId})
                    }
                }
            }
