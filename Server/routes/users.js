@@ -205,7 +205,6 @@ router.get("/stopStream", verify, async (req, res) => {
 // Get currently stream of all class participated
 router.post("/getCurrentlyStream", verify , async (req, res) => {
         var limit = req.body.limit == null ? 0 : req.body.limit
-        console.log(limit)
         try{
             const currentlyStreamings = await Streaming.find({isActive : true}).limit(limit);
             res.json(currentlyStreamings)
@@ -220,7 +219,6 @@ router.post("/getStreamDetail", verify , async (req, res) => {
     const streamCode = req.body.streamCode
     try{
         const theStream = await Streaming.findOne({streamCode})
-        console.log(theStream)
         res.json({
             streamTitle : theStream.streamTitle,
             description : theStream.description,
