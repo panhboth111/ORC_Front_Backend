@@ -162,7 +162,7 @@ router.post("/joinStream", verify, async(req,res) => {
                     'fodeviceselection', 'profile',  'recording',"shortcuts",
                     'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
                     'videoquality', 'filmstrip', 'stats', 'shortcuts',
-                    'tileview', 'videobackgroundblur', 'download', 'help'
+                    'tileview', 'videobackgroundblur', 'download', 'help','info'
                 ],
                 SETTINGS_SECTIONS: ['devices', 'language', 'moderator'],
                 SHOW_JITSI_WATERMARK: false,
@@ -182,7 +182,7 @@ router.post("/joinStream", verify, async(req,res) => {
             await User.updateOne({email},{isStreaming : true})
             res.json({options : options, domain : domain, role : "Lecturer", name : name, isStreaming : true})
         }else{ // Not-Owner
-            // For Stream Participant - **Not Class Owner**
+            // For Stream Participant - *Not Class Owner*
             const interfaceConfigStudent = {
                 TOOLBAR_BUTTONS: [
                     'closedcaptions', 'fullscreen',
