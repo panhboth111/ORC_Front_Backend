@@ -85,7 +85,7 @@ const deviceManagement = (io) => {
             const _d = await Device.findOne({deviceId})
             io.to(_d.socketId).emit('start_streaming',{email:`${deviceId}@device.com`,password:"123456",streamTitle,description,owner})
         }
-        deviceIds.map(id => {
+        deviceIds.map(async id => {
             const _d2 = await Device.findOne({deviceId:id})
             io.to(_d2.socketId).emit('start_casting',{email:`${deviceId}@device.com`,password:"123456",streamTitle})
         })
