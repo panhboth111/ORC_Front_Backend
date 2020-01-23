@@ -24,15 +24,14 @@ const deviceManagement = (io) => {
                 const deviceName = `device-${uID(4)}`
                 const deviceId = `${uID(6)}`
                 await new Device({deviceName,deviceId,socketId:device.id,streaming:device_streaming,cameraPlugged:camera_plugged,online:true}).save()
-
-                await axios.post('http://localhost:3000/auth/signUp',{email:`${deviceName}@device.com`,name:deviceName,pwd:"123456"})
+                await axios.post('http://localhost:3000/auth/deviceSignUp',{email:`${deviceName}@device.com`,name:deviceName,pwd:"123456"})
                 device.emit('update_device_info',{deviceName,deviceId})
                } catch (error) {
                    if(error.code == 11000){
                         const deviceName = `device-${uID(4)}`
                         const deviceId = `${uID(6)}`
                         await new Device({deviceName,deviceId,socketId:device.id,streaming:device_streaming,cameraPlugged:camera_plugged,online:true}).save()
-                        await axios.post('http://localhost:3000',{email:`${deviceName}@device.com`,name:deviceName,pwd:"123456"})
+                        await axios.post('http://localhost:3000/auth/deviceSignUp',{email:`${deviceName}@device.com`,name:deviceName,pwd:"123456"})
                         device.emit('update_device_info',{deviceName,deviceId})
 
                    }

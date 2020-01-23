@@ -62,12 +62,7 @@ router.get("/user", verify , async (req, res) => {
 
 // Start stream
 router.post("/startStream", verify, async (req, res) => {
-    const streamTitle = req.body.streamTitle
-    const description = req.body.description
-    const isPrivate = req.body.isPrivate
-    const password = req.body.password
-    const owner = req.user.email
-    const ownerName = req.user.name
+    const {streamTitle,description,isPrivate,password,owner,ownerName} = req.body
     try{
         var streamCode = null
         var isNotUnique = null
@@ -102,6 +97,32 @@ router.post("/startStream", verify, async (req, res) => {
         res.json(err)
     }
 
+})
+
+router.post('/deviceStartStream',verify,async(req,res)=>{
+    const {streamTitle,description,owner,ownerName} = req.body
+    try{
+        var streamCode = null
+        var isNotUnique = null
+        do{
+            streamCode = uID(12)
+            isNotUnique = await Streaming.findOne({streamCode})
+        }while(isNotUnique)
+
+        const newStream = new Streaming({
+            streamCode,
+            streamTitle,
+            description,
+            owner,
+            ownerName,
+        })
+        const savedStream = await newStream.save()
+        console.log(savedStream)
+        res.json(savedStream)
+    }catch (err){
+        console.log(err)
+        res.json(err)
+    }
 })
 
 // Join Stream
