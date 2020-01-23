@@ -117,16 +117,16 @@ router.post("/joinStream", verify, async(req,res) => {
         const theStream = await Streaming.findOne({streamCode});
         // Check Stream status
         if (!theStream.isActive){
-            res.json({message : "Stream is not currently available", code : "ST-001"})
+            res.json({message : "Stream is not currently available", errCode : "ST-001"})
         }
         // Check Stream privacy
         if (!theStream.isPrivate){
             if (!password.equals("") && password.equals(null)){
                 if(!theStream.password.equals(password)){
-                    res.json({message : "Incorrect password", code : "ST-002"})
+                    res.json({message : "Incorrect password", errCode : "ST-002"})
                 }
             }else{
-                res.json({message : "Password is required", code : "ST-003"})
+                res.json({message : "Password is required", errCode : "ST-003"})
             }     
         }
 
@@ -134,16 +134,25 @@ router.post("/joinStream", verify, async(req,res) => {
         if (theStream.owner === email){ // Owner
             // For Streamer/Lecturer
             const interfaceConfigLecturer = {
+                TOOLBAR_BUTTONS: [
+                    'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
+                    'fodeviceselection', 'profile',  'recording',"shortcuts",
+                    'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+                    'videoquality', 'filmstrip', 'stats', 'shortcuts',
+                    'tileview', 'videobackgroundblur', 'download', 'help'
+                ],
                 SETTINGS_SECTIONS: ['devices', 'language', 'moderator'],
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
+                VERTICAL_FILMSTRIP: true
             }
             const options = {
                 roomName: streamCode,
                 interfaceConfigOverwrite : interfaceConfigLecturer,
                 userInfo : {
                 email : email
-                }
+                },
+                disable1On1Mode: true
             }
             await User.updateOne({email},{isStreaming : true})
             res.json({options : options, domain : domain, role : "Lecturer", name : name, isStreaming : true})
@@ -152,14 +161,13 @@ router.post("/joinStream", verify, async(req,res) => {
             const interfaceConfigStudent = {
                 TOOLBAR_BUTTONS: [
                     'closedcaptions', 'fullscreen',
-                    'recording',
-                    'etherpad', 'settings', 'raisehand',
-                    'videoquality', 'feedback', 'stats', 'shortcuts',
-                    'tileview', 'download'
+                     'settings', 'raisehand',
                 ],
-                SETTINGS_SECTIONS: ['devices', 'language', 'moderator'],
+                SETTINGS_SECTIONS: ['language'],
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
+                VERTICAL_FILMSTRIP: false,
+                // filmStripOnly: true
             }
             const optionsStudents = {
                 roomName: streamCode,
@@ -206,7 +214,7 @@ router.get("/stopStream", verify, async (req, res) => {
 router.post("/getCurrentlyStream", verify , async (req, res) => {
         var limit = req.body.limit == null ? 0 : req.body.limit
         try{
-            const currentlyStreamings = await Streaming.find({isActive : true}).limit(limit);
+            const currentlyStreamings = await Streaming.find({isActive : true}).limit(limit).sort({date: -1});
             res.json(currentlyStreamings)
         }catch(err){
             res.json(err)
@@ -220,6 +228,7 @@ router.post("/getStreamDetail", verify , async (req, res) => {
     try{
         const theStream = await Streaming.findOne({streamCode})
         res.json({
+            streamCode : theStream.streamCode,
             streamTitle : theStream.streamTitle,
             description : theStream.description,
             ownerName : theStream.ownerName
@@ -233,7 +242,7 @@ router.post("/getStreamDetail", verify , async (req, res) => {
 //Get specific user (Obsolete)
 router.get("/:postId", verify , async (req , res) => {
     try{
-        console.log(req.params.postId)
+        // console.log(req.params.postId)
         const user = await User.findOne({email:req.params.postId});
         res.json(user)
     }catch(err){
