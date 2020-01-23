@@ -62,7 +62,9 @@ router.get("/user", verify , async (req, res) => {
 
 // Start stream
 router.post("/startStream", verify, async (req, res) => {
-    const {streamTitle,description,isPrivate,password,owner,ownerName} = req.body
+    const owner = req.user.email
+    const ownerName = req.user.name
+    const {streamTitle,description,isPrivate,password} = req.body
     try{
         var streamCode = null
         var isNotUnique = null
@@ -160,12 +162,14 @@ router.post("/joinStream", verify, async(req,res) => {
                     'fodeviceselection', 'profile',  'recording',"shortcuts",
                     'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
                     'videoquality', 'filmstrip', 'stats', 'shortcuts',
-                    'tileview', 'videobackgroundblur', 'download', 'help'
+                    'tileview', 'videobackgroundblur', 'download', 'help','info'
                 ],
                 SETTINGS_SECTIONS: ['devices', 'language', 'moderator'],
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
+                channelLastN: 1,
                 VERTICAL_FILMSTRIP: true
+                
             }
             const options = {
                 roomName: streamCode,
@@ -173,12 +177,12 @@ router.post("/joinStream", verify, async(req,res) => {
                 userInfo : {
                 email : email
                 },
-                disable1On1Mode: true
+                channelLastN: 1,
             }
             await User.updateOne({email},{isStreaming : true})
             res.json({options : options, domain : domain, role : "Lecturer", name : name, isStreaming : true})
         }else{ // Not-Owner
-            // For Stream Participant - **Not Class Owner**
+            // For Stream Participant - *Not Class Owner*
             const interfaceConfigStudent = {
                 TOOLBAR_BUTTONS: [
                     'closedcaptions', 'fullscreen',
@@ -188,6 +192,7 @@ router.post("/joinStream", verify, async(req,res) => {
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
                 VERTICAL_FILMSTRIP: false,
+                
                 // filmStripOnly: true
             }
             const optionsStudents = {
@@ -195,9 +200,9 @@ router.post("/joinStream", verify, async(req,res) => {
                 interfaceConfigOverwrite : interfaceConfigStudent,
                 userInfo : {
                 email : email
-             }
+                },
+                channelLastN: 1,
         };
-            await User.updateOne({email},{isStreaming : true})
             // Send Back Data Lah
             res.json({options : optionsStudents, domain : domain, role : "Student", name : name})
         }
