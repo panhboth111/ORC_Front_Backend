@@ -38,6 +38,17 @@ router.post("/signUp", async (req , res ) => {
 
 })
 
+router.post("/deviceSignUp", async (req , res ) => {
+    const {email,name} = req.body
+    await bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(req.body.pwd, salt, async (err, hash) => {
+            if (err) return res.json({err})
+            await new User({email,name,role:"device"}).save()
+            await new Credential({email,pwd:hash}).save()
+        })
+    })
+})
+
 //Login
 router.post("/login", async (req , res ) => {
     const email = req.body.email
