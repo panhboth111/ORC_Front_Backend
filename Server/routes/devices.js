@@ -40,6 +40,7 @@ const deviceManagement = (io) => {
            }
            io.emit('info',await Device.find())
         })
+
         io.emit('info',await Device.find()) 
         //change the device's online status to false when it disconnects
         device.on('disconnect',async()=>{
@@ -80,15 +81,18 @@ const deviceManagement = (io) => {
 
     //post routes
     router.post('/startStreaming',async (req,res)=>{
+        console.log("hii")
         const {deviceId,deviceIds,owner,streamTitle,description} = req.body
+        console.log(deviceId)
         if(deviceId !='None'){
             const _d = await Device.findOne({deviceId})
+            console.log(_d)
             io.to(_d.socketId).emit('start_streaming',{email:`${deviceId}@device.com`,password:"123456",streamTitle,description,owner})
         }
         deviceIds.map(async id => {
-            const _d2 = await Device.findOne({deviceId:id})
-            io.to(_d2.socketId).emit('start_casting',{email:`${deviceId}@device.com`,password:"123456",streamTitle})
-        })
+             const _d2 = await Device.findOne({deviceId:id})
+             io.to(_d2.socketId).emit('start_casting',{email:`${deviceId}@device.com`,password:"123456",streamTitle})
+        }) 
     })
 
 
