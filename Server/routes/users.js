@@ -168,7 +168,8 @@ router.post("/joinStream", verify, async(req,res) => {
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
                 channelLastN: 1,
-                VERTICAL_FILMSTRIP: true
+                VERTICAL_FILMSTRIP: true,
+                SET_FILMSTRIP_ENABLED: false
                 
             }
             const options = {
@@ -192,6 +193,7 @@ router.post("/joinStream", verify, async(req,res) => {
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
                 VERTICAL_FILMSTRIP: false,
+                SET_FILMSTRIP_ENABLED: false
                 
                 // filmStripOnly: true
             }

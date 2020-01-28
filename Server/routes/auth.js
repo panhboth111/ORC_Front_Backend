@@ -28,9 +28,9 @@ router.post("/signUp", async (req , res ) => {
                 res.json(savedCredential);
             }catch(err){
                 if (err.code == 11000){
-                    res.json({"message" : "Email is already registered!"})
+                    res.json({"message" : "Email is already registered!",errCode : "SU-001"})
                 }
-                res.json({err}) 
+                res.json({err : err.message , errCode : "SU-002"}) 
             }
         })
     })
