@@ -5,6 +5,7 @@ const router = express.Router()
 const Device = require('../Models/device')
 const User = require('../Models/user')
 const Credential = require('../Models/credential')
+const Stream = require('../Models/streaming')
 const uID = require('../JS/UniqueCode')
 const deviceManagement = (io) => {
     io.on('connection',async (device)=>{
@@ -39,6 +40,7 @@ const deviceManagement = (io) => {
            }
            io.emit('info',await Device.find())
         })
+
         io.emit('info',await Device.find()) 
         //change the device's online status to false when it disconnects
         device.on('disconnect',async()=>{
@@ -78,49 +80,30 @@ const deviceManagement = (io) => {
     })
 
     //post routes
-    router.post('/startProjecting',(req,res)=>{
-        try{
-            const {deviceIds,streamId} = req.body
-            let _d
-            deviceIds.map(async (deviceId)=> {
-                _d = await Device.findOne({deviceId})
-                io.to(_d.socketId).emit('start_projecting',{email:`${_d.deviceName}@device.com`,password:"123456",streamId})
-            })
-            res.send("done") 
-        }catch(err){
-            res.send(err)
-        }
-    })
-    router.post('/stopProjecting',(req,res)=>{
-        try{
-            const {deviceIds} = req.body
-            deviceIds.map(async (deviceId) => {
-                const _device = await Device.findOne({deviceId})
-                io.to(_device.socketId).emit('stop_projecting','')
-            })
-            res.send("done")
-        }catch(err){
-            res.send(err)
-        }
-    })
     router.post('/startStreaming',async (req,res)=>{
-        try {
-            const {deviceId,title,description} = req.body
+        console.log("hii")
+        const {deviceId,deviceIds,owner,streamTitle,description} = req.body
+        console.log(deviceId)
+        if(deviceId !='None'){
             const _d = await Device.findOne({deviceId})
-            io.to(_d.socketId).emit('start_streaming',{email:`${_d.deviceName}@device.com`,password:"123456",title,description})
-        } catch (err) {
-            res.send(err)
+            console.log(_d)
+            io.to(_d.socketId).emit('start_streaming',{email:`${deviceId}@device.com`,password:"123456",streamTitle,description,owner})
         }
+        deviceIds.map(async id => {
+             const _d2 = await Device.findOne({deviceId:id})
+             io.to(_d2.socketId).emit('start_casting',{email:`${deviceId}@device.com`,password:"123456",streamTitle})
+        }) 
     })
+
+
     router.post('/stopStreaming',async (req,res)=>{
-        try {
-            const {deviceId} = req.body
-            const _device = await Device.findOne({deviceId}) 
-            io.to(_device.socketId).emit('stop_streaming')
-            res.send("done")
-        } catch (err) {
-            res.send(err)
-        }
+        const {ownerName} = req.body
+        const _Stream = await Stream.findOne({ownerName})
+        const _StreamTitle = _Stream.streamTitle
+        const Devices = await Devices.find({streaming: _StreamTitle})
+        Devices.map(d => {
+            io.to(d.socketId).emit('stop_streaming','')
+        })
     })
 }
 
