@@ -4,7 +4,7 @@ const schema = mongoose.Schema({
     deviceName:String,
     deviceId:String,
     socketId:String,
-    streaming:Boolean,
+    streaming:String,
     cameraPlugged:Boolean,
     online:Boolean
 })
