@@ -62,6 +62,7 @@ router.get("/user", verify , async (req, res) => {
 
 // Start stream
 router.post("/startStream", verify, async (req, res) => {
+    console.log("hello")
     const owner = req.user.email
     const ownerName = req.user.name
     const {streamTitle,description,isPrivate,password} = req.body
@@ -102,7 +103,9 @@ router.post("/startStream", verify, async (req, res) => {
 })
 
 router.post('/deviceStartStream',verify,async(req,res)=>{
-    const {streamTitle,description,owner,ownerName} = req.body
+    const deviceEmail = req.user.email
+    const {streamTitle,description,isPrivate,password,streamBy} = req.body
+    const _U = await User.findOne({email:streamBy})
     try{
         var streamCode = null
         var isNotUnique = null
@@ -115,12 +118,17 @@ router.post('/deviceStartStream',verify,async(req,res)=>{
             streamCode,
             streamTitle,
             description,
-            owner,
-            ownerName,
+            isPrivate,
+            password,
+            owner:streamBy,
+            ownerName:_U.name,
+            streamFrom:deviceEmail
         })
         const savedStream = await newStream.save()
+        await User.updateOne({email:streamBy},{currentStream:streamCode})
         console.log(savedStream)
-        res.json(savedStream)
+        await User.updateOne({email:streamBy},{isStreaming : true})
+        res.json({streamCode : savedStream.streamCode,streamTitle : savedStream.streamTitle, Description : savedStream.Description})
     }catch (err){
         console.log(err)
         res.json(err)
@@ -154,7 +162,7 @@ router.post("/joinStream", verify, async(req,res) => {
         }
 
         // Check ownership
-        if (theStream.owner === email){ // Owner
+        if ((theStream.owner === email && theStream.streamFrom == 'none') || theStream.streamFrom === email){ // Owner
             // For Streamer/Lecturer
             const interfaceConfigLecturer = {
                 TOOLBAR_BUTTONS: [
@@ -179,7 +187,7 @@ router.post("/joinStream", verify, async(req,res) => {
                 },
                 channelLastN: 1,
             }
-            await User.updateOne({email},{isStreaming : true})
+            if(theStream.streamFrom !== email) await User.updateOne({email},{isStreaming : true})
             res.json({options : options, domain : domain, role : "Lecturer", name : name, isStreaming : true})
         }else{ // Not-Owner
             // For Stream Participant - *Not Class Owner*
