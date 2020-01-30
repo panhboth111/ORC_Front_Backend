@@ -36,6 +36,10 @@ const schema = mongoose.Schema({
     isActive : {
         type : Boolean,
         default : true
+    },
+    streamFrom: {
+        type:String,
+        default: "none"
     }
 })
 

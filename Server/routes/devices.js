@@ -25,14 +25,14 @@ const deviceManagement = (io) => {
                 const deviceName = `device-${uID(4)}`
                 const deviceId = `${uID(6)}`
                 await new Device({deviceName,deviceId,socketId:device.id,streaming:device_streaming,cameraPlugged:camera_plugged,online:true}).save()
-                await axios.post('http://localhost:3000/auth/deviceSignUp',{email:`${deviceName}@device.com`,name:deviceName,pwd:"123456"})
+                await axios.post('http://localhost:3001/auth/deviceSignUp',{email:`${deviceName}@device.com`,name:deviceName,pwd:"123456"})
                 device.emit('update_device_info',{deviceName,deviceId})
                } catch (error) {
                    if(error.code == 11000){
                         const deviceName = `device-${uID(4)}`
                         const deviceId = `${uID(6)}`
                         await new Device({deviceName,deviceId,socketId:device.id,streaming:device_streaming,cameraPlugged:camera_plugged,online:true}).save()
-                        await axios.post('http://localhost:3000/auth/deviceSignUp',{email:`${deviceName}@device.com`,name:deviceName,pwd:"123456"})
+                        await axios.post('http://localhost:3001/auth/deviceSignUp',{email:`${deviceName}@device.com`,name:deviceName,pwd:"123456"})
                         device.emit('update_device_info',{deviceName,deviceId})
 
                    }
@@ -51,7 +51,8 @@ const deviceManagement = (io) => {
         device.on('change_in_device',async(device_info)=>{
             const {device_streaming,camera_plugged} = device_info
             await Device.updateOne({socketId:device.id},{streaming:device_streaming,cameraPlugged:camera_plugged})
-            io.emit('info',await Device.find()) 
+            io.emit('info',await Device.find())
+            console.log("changed") 
         })
    
     })
@@ -81,29 +82,50 @@ const deviceManagement = (io) => {
 
     //post routes
     router.post('/startStreaming',async (req,res)=>{
-        console.log("hii")
-        const {deviceId,deviceIds,owner,streamTitle,description} = req.body
-        console.log(deviceId)
-        if(deviceId !='None'){
-            const _d = await Device.findOne({deviceId})
-            console.log(_d)
-            io.to(_d.socketId).emit('start_streaming',{email:`${deviceId}@device.com`,password:"123456",streamTitle,description,owner})
+        console.log(req.body)
+        try{
+            const {deviceId,deviceIds,owner,streamTitle,description} = req.body
+            if(deviceId && deviceIds && owner && streamTitle && description){
+                const _d = await Device.findOne({deviceId})
+                const _u = await User.findOne({name:owner})
+                if(_d && _u) io.to(_d.socketId).emit('start_streaming',{email:`${_d.deviceName}@device.com`,password:"123456",streamTitle,description,streamBy:_u.email,deviceIds,owner})
+            }
+        }catch(err){
+            res.send(err)
         }
+    })
+
+    router.post('/startCasting',async (req,res)=>{
+        const {deviceIds,streamTitle,owner} = req.body
+        const _S = await Stream.findOne({ownerName:owner})
+        console.log(owner)
+        console.log(_S)
+        io.emit('redirect',{owner,redirect:_S.streamCode})
+        console.log("hi")
         deviceIds.map(async id => {
-             const _d2 = await Device.findOne({deviceId:id})
-             io.to(_d2.socketId).emit('start_casting',{email:`${deviceId}@device.com`,password:"123456",streamTitle})
-        }) 
+            const _d2 = await Device.findOne({deviceId:id})
+            io.to(_d2.socketId).emit('start_casting',{email:`${_d2.deviceName}@device.com`,password:"123456",streamTitle})
+       }) 
     })
 
 
     router.post('/stopStreaming',async (req,res)=>{
-        const {ownerName} = req.body
-        const _Stream = await Stream.findOne({ownerName})
-        const _StreamTitle = _Stream.streamTitle
-        const Devices = await Devices.find({streaming: _StreamTitle})
-        Devices.map(d => {
-            io.to(d.socketId).emit('stop_streaming','')
-        })
+        console.log(req.body)
+        console.log("hellooooooo stoppppppppp")
+        try {
+            const {ownerName} = req.body
+            const _U = await User.findOne({name:ownerName})
+            const _S = await Stream.findOne({streamCode:_U.currentStream})
+            console.log(_S.streamTitle)
+            const Devices = await Device.find({streaming:_S.streamTitle})
+            console.log(Devices)
+            Devices.map(d => {
+                console.log(d.socketId)
+                io.to(d.socketId).emit('stop_streaming','')
+            })
+        } catch (error) {
+            
+        }
     })
 }
 
