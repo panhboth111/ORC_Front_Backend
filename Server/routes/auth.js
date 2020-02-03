@@ -1,10 +1,10 @@
 const express = require('express')
-const app = express()
 const router = express.Router();
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const User = require("../Models/user")
 const Credential = require("../Models/credential")
+const validate = require("validate.js");
 
 
 //Get Data for sign up
@@ -55,9 +55,31 @@ router.post("/deviceSignUp", async (req , res ) => {
 //Login
 router.post("/login", async (req , res ) => {
     const email = req.body.email
-    const pwd = req.body.pwd
+    const password = req.body.pwd
     console.log("New Login from : "+email)
     // console.log(email + " " + pwd)
+
+    const constraint = {
+        email : {
+            presence: true,
+            email : true
+        },
+        password : {
+            presence : true,
+            length : {
+                minimum : 4,
+                maximum : 16,
+                tooShort : "is too short",
+                tooLong : "is too long"
+            }
+        }
+    }
+
+    const validateRes = validate({email,password},constraint)
+
+    if (validateRes != undefined){
+        return res.json({message:"Validation error"})
+    }
 
     const existUser = await Credential.findOne({email:email})
     //Check if the user is exist
@@ -65,7 +87,7 @@ router.post("/login", async (req , res ) => {
     //Get User to get the username later
     const user = await User.findOne({email})
     //Validate encrypted pass
-    const validPass = bcrypt.compare(pwd , existUser.pwd , (err, isMatch) => {
+    const validPass = bcrypt.compare(password , existUser.pwd , (err, isMatch) => {
         if (err) return res.json({err})
         if (isMatch){ // if the pwd matches 
             // Sign the token

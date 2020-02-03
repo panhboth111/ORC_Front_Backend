@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
 
 
 //Connect to DB
-const DB_CONNECTION = 'mongodb://localhost:27017/testing' 
+const DB_CONNECTION =  process.env.DB_CONNECTION || 'mongodb://localhost:27017/testing' 
 mongoose.connect(DB_CONNECTION, {useNewUrlParser: true, useUnifiedTopology: true},() => console.log("Database connection established"))
 ;
 
