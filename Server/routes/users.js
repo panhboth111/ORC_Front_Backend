@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const axio = require('axios')
+const axios = require('axios')
 const User = require("../Models/user")
 const _Class = require("../Models/class")
 const router = express.Router();
@@ -62,6 +62,7 @@ router.get("/user", verify , async (req, res) => {
 
 // Start stream
 router.post("/startStream", verify, async (req, res) => {
+    console.log("hello")
     const owner = req.user.email
     const ownerName = req.user.name
     const {streamTitle,description,isPrivate,password} = req.body
@@ -91,8 +92,8 @@ router.post("/startStream", verify, async (req, res) => {
             ownerName
         })
         const savedStream = await newStream.save()
-        console.log(savedStream)
         await User.updateOne({email:owner},{isStreaming : true})
+        await axios.post('http://10.10.15.11:4000/createRoom',{roomName:streamTitle,roomId:streamCode}).catch(er => console.log(er))
         res.json({streamCode : savedStream.streamCode,streamTitle : savedStream.streamTitle, Description : savedStream.Description})
     }catch (err){
         console.log(err)
@@ -102,7 +103,9 @@ router.post("/startStream", verify, async (req, res) => {
 })
 
 router.post('/deviceStartStream',verify,async(req,res)=>{
-    const {streamTitle,description,owner,ownerName} = req.body
+    const deviceEmail = req.user.email
+    const {streamTitle,description,isPrivate,password,streamBy} = req.body
+    const _U = await User.findOne({email:streamBy})
     try{
         var streamCode = null
         var isNotUnique = null
@@ -115,12 +118,20 @@ router.post('/deviceStartStream',verify,async(req,res)=>{
             streamCode,
             streamTitle,
             description,
-            owner,
-            ownerName,
+            isPrivate,
+            password,
+            owner:streamBy,
+            ownerName:_U.name,
+            streamFrom:deviceEmail
         })
         const savedStream = await newStream.save()
-        console.log(savedStream)
-        res.json(savedStream)
+        await User.updateOne({email:streamBy},{currentStream:streamCode})
+        await User.updateOne({email:streamBy},{isStreaming : true})
+        await axios.post('http://10.10.15.11:4000/createRoom',{roomName:streamTitle,roomId:streamCode}).catch(er => console.log(er))
+        axios.post('http://10.10.15.11:3001/devices/redirect',{streamBy,streamCode}).catch((er)=> console.log(er))
+        res.json({streamCode : savedStream.streamCode,streamTitle : savedStream.streamTitle, Description : savedStream.Description})
+
+
     }catch (err){
         console.log(err)
         res.json(err)
@@ -154,7 +165,7 @@ router.post("/joinStream", verify, async(req,res) => {
         }
 
         // Check ownership
-        if (theStream.owner === email){ // Owner
+        if ((theStream.owner === email && theStream.streamFrom == 'none') || (theStream.streamFrom === email)){ // Owner
             // For Streamer/Lecturer
             const interfaceConfigLecturer = {
                 TOOLBAR_BUTTONS: [
@@ -180,7 +191,7 @@ router.post("/joinStream", verify, async(req,res) => {
                 },
                 channelLastN: 1,
             }
-            await User.updateOne({email},{isStreaming : true})
+            if(theStream.streamFrom !== email) await User.updateOne({email},{isStreaming : true})
             res.json({options : options, domain : domain, role : "Lecturer", name : name, isStreaming : true})
         }else{ // Not-Owner
             // For Stream Participant - *Not Class Owner*
@@ -218,7 +229,7 @@ router.post("/joinStream", verify, async(req,res) => {
 // Stop stream
 router.get("/stopStream", verify, async (req, res) => {
     const owner = req.user.email
-    
+    const _S = await Streaming.findOne({owner})
     try{
         // Find the stream and set the active state to false
         const result = await Streaming.updateOne({ owner , isActive : true },{ isActive : false })
@@ -233,9 +244,11 @@ router.get("/stopStream", verify, async (req, res) => {
         }else{
             res.json({message : "Problem Occured during stop streaming process", status : false})
         }
+
     }catch(err){
         res.json(err)
     }
+    //await axios.post('http://10.10.15.11:4000/deleteRoom',{roomId:_S.streamCode}).catch(err => console.log(err))
 })
 
 // Get currently stream of all class participated

@@ -43,8 +43,8 @@ router.post("/deviceSignUp", async (req , res ) => {
     await bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(req.body.pwd, salt, async (err, hash) => {
             if (err) return res.json({err})
-            const user =  new User({email,name,role:"device"})
-            const credential = new  Credential({email,pwd:hash})
+            const user =  new User({email,name})
+            const credential = new  Credential({email,pwd:hash,role:"device"})
             const savedUser = await user.save()
             const savedCredential = await credential.save()
             res.json(savedCredential)
